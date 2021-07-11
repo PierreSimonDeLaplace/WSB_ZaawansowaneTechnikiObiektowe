@@ -1,0 +1,116 @@
+% Pierwsze uruchomienie
+% -Aktualizacja wszystkich pakietów, MiteX Update
+% -Zmiana w~konfiguracji bitex % -> na konkretnś sciężkę do biber'a
+%  np. "C:/Program Files/MiKTeX 2.9/miktex/bin/x64/biber.exe" %
+% -Zmiana w~konfiguracji makeindex -> zmienić na ścieżkę do makeglossaries
+%  i dodać rozszerzenie .glo !
+%  np. "C:/Program Files/MiKTeX 2.9/miktex/bin/x64/makeglossaries.exe" %.glo  
+% Zainstalować ActivePerl, wymagany do poprawnego działania skryptu makeglossaries 
+
+
+
+\usepackage[left=2.5cm,right=2.5cm,top=1.5cm,bottom=1.5cm]{geometry} % Bez miejsca na notatki
+%\usepackage[left=0.5cm,right=3.5cm,top=1.5cm,bottom=1.5cm]{geometry} % Miejsce na notatki - prawy margines
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{wrapfig}     				%wraping figure
+\usepackage{float}
+%\usepackage[caption=false]{subfig} 		%for subfigures placed vertically
+\usepackage{subfigure}
+\usepackage{titlesec} 					%Do tytulu rozdzialow
+\usepackage{pdfpages}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{listings}
+%\usepackage{algorithmicx}
+\usepackage{color}
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning,shapes}
+\usepackage{indentfirst}
+\usepackage{ulem} %underline
+\usepackage{enumitem}
+\usepackage{setspace}
+\graphicspath{ {images/} }  % Odniesienie do folderu ze zdjeciami
+\usepackage[
+natbib=true,
+style=numeric,
+sorting=none,
+]{biblatex}
+\bibliography{WSB_PodstawyPrzetwarzaniaSygnalow}
+\usepackage[nottoc]{tocbibind}
+\usepackage[toc]{glossaries} 
+\usepackage{tcolorbox} %frame around text
+\makeglossaries
+
+
+
+\definecolor{bluekeywords}{rgb}{0.13,0.13,1}
+\definecolor{greencomments}{rgb}{0,0.5,0}
+\definecolor{redstrings}{rgb}{0.9,0,0}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	%	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\normalsize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2,
+	frame=single
+}
+\lstset{language=Matlab,
+	showspaces=false,
+	showtabs=false,
+	breaklines=true,
+	showstringspaces=false,
+	breakatwhitespace=true,
+	escapeinside={(*@}{@*)},
+	commentstyle=\color{greencomments},
+	keywordstyle=\color{bluekeywords}\bfseries,
+	stringstyle=\color{redstrings},
+	%	basicstyle=\ttfamily,
+	style=mystyle
+}
+
+
+\newcommand{\question}[1]{{\color{magenta} \textbf{#1 (odpowiedź umieść w komentarzu)}}\\}
+
+%%%%%%%%%%%% PYTANIA ODDZIELONE PIONOWA LINIA OD ODPOWIEDZI %%%%%%%%%%%%
+
+\newcommand{\longtabAllignToTheTop}{\vspace{-0.6cm}}
+\newcommand{\newSection}[1]
+{
+	\begin{longtabu} to \textwidth {X[1,l]       %aligned left
+			|			 %separation line
+			X[4,l]}      %four times as wide as first column
+		
+		#1
+		
+	\end{longtabu}
+	\newpage
+}
+
+\newcommand{\questionAndAnswer}[2]{
+	\textbf{#1}
+	& 	
+	\longtabAllignToTheTop
+	
+	#2 \\
+}
