@@ -1,0 +1,51 @@
+%opening
+\author{
+	Jakub Głuszek\\
+}
+\title{Zaawansowane techniki obiektowe\\Laboratorium}
+\date{\today}
+
+
+\makeatletter
+\newcommand{\linia}{\rule{\linewidth}{0.4mm}}
+\renewcommand{\maketitle}{\begin{titlepage}
+		\vspace*{1cm}
+		\begin{center}\large
+			Wyższa Szkoła Bankowa\\
+			Wydział Finansów i Zarządzania\\
+			Informatyka Inżynierska\\
+			Studia II stopnia, semestr 2/3\\
+			Gdańsk
+		\end{center}
+		\vspace{3cm}
+		\noindent
+		\begin{center}
+			\Huge \textbf{\textsc{\@title}}
+		\end{center}
+		\vspace{0.5cm}
+		\begin{center}
+			\Large \version
+		\end{center}		
+		\vspace{1cm}
+		\begin{flushright}
+			\begin{minipage}{5cm}
+				\textit{\small Autor:}\\
+				\normalsize \textsc{\@author} \par
+			\end{minipage}
+			\vspace{1cm}
+		\end{flushright}
+		
+		\begin{center}
+			\includegraphics[width=.4\linewidth]{images/logo}
+		\end{center}
+		
+		\vspace*{\stretch{6}}
+		\begin{center}
+			\Large\@date
+		\end{center}
+	\end{titlepage}%
+}
+
+\begin{titlepage}
+	\maketitle
+\end{titlepage}

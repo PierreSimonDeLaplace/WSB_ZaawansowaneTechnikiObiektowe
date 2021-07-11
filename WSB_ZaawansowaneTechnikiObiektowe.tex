@@ -1,0 +1,40 @@
+\documentclass[letterpaper, twoside]{article}
+\usepackage{mystyle}
+
+\newenvironment{leading}[1]{\begin{spacing}{#1}}{\end{spacing}}		%interlinia  
+\newcommand{\version}{v0.1.0}
+
+\begin{document}
+
+\input{./tex/FirstPage.tex}
+\tableofcontents
+\newpage
+
+
+\input{./tex/Lab1.tex}
+\clearpage
+\input{./tex/Lab2.tex}
+\clearpage
+\input{./tex/Lab3.tex}
+\clearpage
+\input{./tex/Lab4.tex}
+\clearpage
+\input{./tex/Lab5.tex}
+\clearpage
+\input{./tex/Lab6.tex}
+\clearpage
+
+\newpage
+\nocite{*}
+\printbibliography[]
+
+%\newpage
+%\renewcommand{\listfigurename}{Wykaz rysunków}
+%\listoffigures
+%\newpage
+%\renewcommand{\listtablename}{Wykaz tabel}
+%\listoftables
+%\newpage
+%\lstlistoflistings
+
+\end{document}
