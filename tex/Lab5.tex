@@ -1,1 +1,407 @@
-\section{Test-driven-developlment NUnit and Moq}
+\section{TDD ang. Test-Driven-Developlment}
+
+Wytwarzanie sterowane testami (TDD ang. Test-Driven Development) polega na wytwarzaniu oprogramowania w krótkich powtarzających się cyklach:
+\begin{enumerate}
+	\item napisanie testu, który będzie się kończył niepowodzeniem (nie ma jeszcze kodu, który można by było przetestować),
+	\item napisanie kodu powodującego przejście wcześniej napisanego testu,
+	\item refaktoryzacja napisanego kodu.
+\end{enumerate}
+Testy powinny być automatyczne i same sprawdzać poprawność wyników.
+
+Korzyścią ze stosowania tego podejścia jest posiadanie testu dla każdego fragmentu kodu. Dodawania funkcjonalności może odbywać się bez obaw, że nasze działania przyczynią się do awarii systemu. Jest to bardzo istotna zaleta pisania testów. Innym, ważniejszym powodem przemawiającym za stosowaniem TDD jest inne spojrzenie na wytwarzane oprogramowanie. Kod projektowany z myślą o testowaniu wymusza luźne powiązanie komponentów. Pozwalają one dostrzec ważne decyzje dotyczące struktury programu. Podejście to zmusza programistę do skupieniu się na interfejsie, a~nie implementacji. Dodatkowo testy jednostkowe są bardzo dobrą formą dokumentowania wytwarzanego oprogramowania. Pełnią funkcję przykładów ułatwiających innym programistom pracę z naszym projektem. 
+
+Istotne jest, aby testować oprogramowanie pod kątem tego co może pójść źle (tzw. "brudny test"). Częstym błędem jest poświęcanie większej części czasu na sprawdzania standardowego, poprawnego działania kodu. 
+
+Dane wejściowe powinny być tak dobrane, aby mogły wyjawić błędy niewidoczne w innych przypadkach. Nie ma sensu testować modułu dla danych, które są zbliżone do przypadku z danymi już sprawdzonymi. Jeśli dwa testy prowadzą do wykrycia tego samego błędu najprawdopodobniej potrzeby jest tylko jeden test. Dodatkowo bazując na doświadczeniu warto przewidywać miejsca, gdzie mogą znajdować się błędy. 
+
+Obszarem wartym przetestowania są wartości graniczne. Pozwalają na wykrycie np. błędów związanych z~użyciem znaku \texttt{>} zamiast \texttt{>=} itd. W przypadku wartości granicznych można napisać trzy testy dla wartości równej badanej, trochę większej oraz nieco mniejszej. Warto również sprawdzić złożone wartości graniczne, co w~przypadku mnożenia, dzielenia dużych liczb przez siebie albo w sytuacji, gdy jedna z nich ma wartość zero. Można sprawdzić klasy złych danych np. gdy posiadamy zbyt mało danych, zbyt wiele danych, dane mają zły rodzaj, zły rozmiar albo nie zostały zainicjalizowane. Nie należy zapominać o sprawdzeniu przypadków nominalnych (standardowych) wraz z wartościami minimalnymi oraz maksymalnymi. Dodatkowo warto ułatwić sobie prace i sprawdzać wartości łatwe do ręcznego obliczenia, tak aby zmniejszyć ryzyko pomyłki. 
+
+W przypadku testów jak i~w~wielu innych obszarach obowiązuje zasada pareto czyli 80\% błędów znajduje się w 20\% procentach klas lub procedur projektu. Należy pamiętać, że zwiększenie jakości skraca czas pracy i zmniejsza koszty. W latach '70 oraz '80 przeprowadzono badania i ustalono, że około 95\% błędów powodują programiści, 2\% oprogramowanie systemowe (kompilator i system operacyjny), 2\% inne oprogramowanie i~około 1\% warstwa sprzętowa. Aktualnie można przypuszczać, że udział błędów programisty jest większy. Na błędy programistów składają się zarówno błędy popełnione przy pisaniu kodu jak i defekty związane z~wymaganiami oraz błędy w projekcie. Błędy zdarzają się równie często w testowanym kodzie jak w samych testach. Dlatego należy testy pisać z taką samą starannością jak główny kod. 
+
+Czasami przyjmuje się, że minimalna liczba testów pozwalająca pokryć kod wynosi jeden dla liniowej ścieżki wykonywania programu. Dalej dla każdego wyrażenia \texttt{if}, \texttt{while}, \texttt{for} itd. należy dodać jeden test. Dodatkowo należy przewidzieć jeden dodatkowy test dla każdego przypadku \texttt{case} w pętli \texttt{switch}. Jest to jednak minimalny zbiór testów nie uwzględniający różnych kombinacji danych wejściowych. 
+
+W przypadku poniższego kodu:
+\begin{lstlisting}[caption={Testowanie przepływu danych}, label={lab5/lst/unitTestPaths}]
+if (Condition 1)
+{
+	x = a;
+}
+else
+{
+	x = b;
+}
+if (Condition 2)
+{
+	y = x + 1;
+}
+else
+{
+	y = x - 1;
+}
+\end{lstlisting}
+Należy napisać dwa testy dla Condition 1 = True oraz Condition 2 = True i Condition 1 = False oraz Condition 2 = False. Dalej należałoby  dodać dwa kolejne testy tak, aby sprawdzić x = a oraz y = x - 1.
+% TODO: Obszerniejszy przykład znajduje się w Kod Doskonały - Steve McConnel page. 540, 546, 547 (analiza wartości granicznych). WARTO GO DODAĆ ZMIAST POWYŻSZEGO!
+  
+% Przykład aplikacji płacowej. 
+%[Payroll]->[Employee]
+%[Payroll]->[EmployeeDatabase]
+%[Payroll]->[CheckWriter]
+%[EmoloyeeDatabase]->[Employee]
+% Oczywiście nie będziemy się na tym etapie przejmować bazą danych, jest to szczegół implementacyjny. TDD wymusza na nas, aby utworzyć odpowiednią abstrakcję \texttt{IEmployeeDataAccess}. Podczas pisania testów będzie możliwe utworzenie mockera, który nam zasymuluje działanie bazy danych. Ponieważ nie posiadamy również klasy \texttt{Employee} również tę klasę należy zastąpić mockerem.
+
+Poza testami jednostkowymi istnieją również inne rodzaje testów. Jednym z nich są testy akceptacyjne podczas których klient sprawdza czy wymagania zostały popranie zrealizowane. Powinny być pisane przez osoby nieznające wewnętrznych mechanizmów systemu. Testy jednostkowe zwykle pisane są przez samych programistów. Testy akceptacyjne zazwyczaj są automatyzowane, pisane w językach specyfikacji (np. FitNesse). Te testy również mają istotny wpływ na architekturę. Aplikacja musi zostać podzielona na odpowiednie komponenty umożliwiające przetestowanie jej. Interfejs użytkownika musi być oddzielony od logiki biznesowej. 
+
+%Testy akceptacyjne dla przykładu aplikacji płacowej:
+%1. Dodanie dwóch pracowników
+%2. Dokonaniu wypłaty
+%3. Weryfikacja prawidłowości wygenerowanych czeków.
+
+% Testy integracyjne polegają na uruchomieniu dwóch lub większej liczby klas, pakietów, komponentów lub podystemów. Ten rodzaj testów jest wykonywany zazywczaj jak tylko dwie pierwsze klasy zostaną napisane i trwa do ukończenia projektu. 
+% Testowanie systemowe to uruchmianie oprogramowania w finalnej konfiguracji, łącznie z innymi systemami i urządzeniami. Badane jest bezpieczeństwo, wydajność, praca z zasobami, synchronizacja i inne cechy, które nie mogą być sprawdzone na niższych poziomach.
+
+Testowanie nie jest jednak panaceum na wszystkie problemy z oprogramowaniem. Ich stosowanie pozwala znaleźć niespełna 60\% defektów. Pomyślnie zakończone procedury testowania nie oznacza, że wszystkie błędy zostały znalezione. Brak błędów może również oznaczać, że testowanie było nieskuteczne. Zwiększanie liczby testów nie powoduje też, że kod staje się lepszy, konieczna jest również refaktoryzacja kodu.
+% Kod doskonały - Steve McConnel page. 534.
+% Przykład z wagą dodawanie testów do jak stawanie codziennie na wadze w nadziei, że schudniemy. Należy zmiana podejścia zarówno do pisania kodu jak i diety :)
+
+%TODO: Przetestować jakiś darmowy monitor pokrycia. 
+%https://marketplace.visualstudio.com/items?itemName=FortuneNgwenya.FineCodeCoverage
+
+
+
+%Podczas pisania testów często konieczne jest przekazanie obiektu do badanej klasy. W tym celu możemy wykorzystać tzw. dummy object. Taki obiekt nic nie robi, jest przekazywany jedynie, aby uzupełnić listę przekazywanych parametrów. Innym rodzajem są fake objects, które posiadają działającą implementację zbliżoną do prawdziwego obiektu. Np. pewien stan może być zapisany i przechowywany w takim obiekcie. Fakiem można również nazwać przechowywaną w pamięci bazę danych. Kolejnym rodzajem są stuby, które zawierają na sztywno zapisane zwracane wartości dla konkretnych parametrów. Dodatkowo mogą zapisywać informacje o wywoływaniach funkcji (gateway wiadomości mailowych, mógłby przechowywać dane o liczbie wysłanych wiadomości). Mockery natomiast są podobne do stubów, ale pisane są dla konkretnego testu. Wymagają określenie oczekiwań podczas pisania testów.   
+
+Często testowana klasa posiada zależność od innego obiektu np. wstrzykiwanego przez konstruktor. Np. obiekt implementujący \texttt{IRepository} może być konieczny, w klasie usługi. Ponieważ zależy nam, aby testować tylko jedną klasę, tę drugą, wstrzykiwaną należy spreparować. W tym celu wykorzystuje się tzw. mockery. Pozwalają one na symulację działania zależności takich jak bazy danych, połączenia sieciowe czy operacje wejścia-wyjścia. Jeżeli testowana klasa wykorzystuje obiekt do czytania informacji z bazy danych albo web serwisu nie powinniśmy tego obiektu wstrzykiwać do testowanej klasy podczas testów. Testowana powinna być sama klasa, a nie klasa wraz w innymi obiektami, których potrzebuje do działania. 
+
+
+\subsection{NUnit}
+NUnit jest frameworkiem do pisania testów jednostkowych. Jest on całkowicie darmowy, również do zastosowania komercyjnego (licencja MIT). Posiada on bardzo prostą krzywą uczenia, bez większej znajomości technik testowania, każdy powinien być w~stanie z łatwością przetestować pisaną klasę.
+
+\subsubsection{Zadanie 1}
+Utwórz solucję zawierającą projekt \texttt{Class library} oraz \texttt{NUnit Test Project}. Pierwszy projekt nazwij \texttt{AbstractionDataTypes}, drugi \texttt{AbstractionDataTypesUnitTests}. Klikając \texttt{View->Test Explorer} albo za pomocą skrótu klawiszowego \texttt{Ctrl+E,T} otwórz widok eksploratora testów. 
+
+Do projektu \texttt{AbstractionDataTypesUnitTests} dodaj referencję do projektu \texttt{AbstractionDataTypes}. Aby to zrobić należy kliknąć PPM na projekt \texttt{AbstractionDataTypesUnitTests} i dalej \texttt{Add->Project references...} i wskazać \texttt{AbstractionDataTypes}. 
+
+W tym miejscu mamy działające środowisko. W oknie \texttt{TestExplorer} możemy uruchomić testy klikając przycisk \texttt{Run All Tests}. Jedyny utworzony automatycznie test powinien się wykonać poprawnie.
+
+Zanim rozpoczniemy pisać kod w bibliotece zgodnie z zasadą TDD należy przygotować pierwszy test, który zakończy się niepowodzeniem. Zamień metodę \texttt{Test1} na \texttt{CreateStack} umieść w niej poniższy kod:
+\begin{lstlisting}
+[Test]
+public void CreateCustomStack()
+{
+	CustomStack customStack = new();
+}
+\end{lstlisting}
+Kod nie przejdzie kompilacji ponieważ klasa \texttt{CustomStack} jeszcze nie istnieje. Utwórz tę klasę w projekcie \texttt{AbstractionDataTypes} i dodaj dyrektywę \texttt{using AbstractDataTypes} w pliku \texttt{CustomStackUnitTests.cs}. Solucja powinna przejść proces kompilacji.
+
+Ponieważ utworzony stos powinien być pusty dodaj metodę asercji na końcu metody \texttt{CreateCustomStack}:
+\begin{lstlisting}
+	[Test]
+	public void CreateCustomStack()
+	{
+		CustomStack customStack = new();
+		Assert.IsTrue(customStack.IsEmpty());
+	}
+\end{lstlisting}
+Ponownie w klasie \texttt{CustomStack} brakuje metody \texttt{IsEmpty()}, klikając na nazwę tej metody w wyrażeniu asercji PPM albo używając skrótu klawiszowego Alt+Enter, dodaj metodę do klasy \texttt{CustomStack}. Kod powinien przejść kompilację. Uruchom testy jednostkowe, zakończą się niepowodzeniem. Aby sprawić, że testy się wykonają zwróć wartość \texttt{true} w funkcji \texttt{IsEmpty()}, w metodzie TDD staramy się w pierwszej kolejności przejść testy po linii najmniejszego oporu. Dodatkowo możesz zmienić nazwę metody \texttt{CreateCustomStack} na np. \texttt{NewStackShouldBeEmpty}, lepiej obrazującą co robi dany test. Zrób to korzystając z narzędzia refaktoryzacji ustawiając kursor myszki na nazwie metody i klikając \texttt{Ctrl+R+R}. Uruchom testy, powinny one wykonać się poprawnie.
+
+Dodaj teraz kolejny test:
+\begin{lstlisting}
+[Test]
+public void PushElementShouldNotBeEmpty()
+{
+	CustomStack customStack = new();
+	customStack.Push(0);
+	Assert.IsFalse(customStack.IsEmpty());
+}
+\end{lstlisting}
+Jak wcześniej dodaj metodę \texttt{Push} do klasy \texttt{CustomStack}. Uruchom testy, zakończą się one niepowodzeniem. Umieść w klasie \texttt{CustomStack} poniższy kod, aby sprawić, że testy wykonają się poprawnie:
+\begin{lstlisting}
+public class CustomStack
+{
+	private bool isEmpty = true;
+	public bool IsEmpty() => isEmpty;
+	public void Push(int element) => this.isEmpty = false;
+}
+\end{lstlisting}
+Ponieważ testy wykonały się bez błędów można teraz wykonać prostą refaktoryzację. W klasie zawierającej testy (\texttt{CustomStackUnitTests}) utwórz pole typu \texttt{CustomStack} oraz przypisz do niego obiekt w metodzie \texttt{Setup}. Usuń tworzenie obiektu \texttt{CustomStack} z metod testujących. Od teraz przed każdym uruchomieniem każdego z testów, zostanie wykonana metoda \texttt{Setup}, która utworzy nową instancję klasy stosu. Uruchom ponownie testy, powinny się one wykonać poprawnie.
+
+Utwórz kolejną metodę testującą np. \texttt{PopElementShouldThrowAnException}. Dodaj do niej wywołanie metody zdjęcia elementu ze stosu \texttt{customStack.Pop()}. Zakładając, że nowo stworzony stos jest pusty, to co powinna zwrócić testowana metoda? Klasa powinna zgłosić wyjątek np. \texttt{InvalidOperationException}. Można również napisać własny wyjątek dziedziczący po \texttt{Exception}. Dodaj implementację metody jedynie w~zakresie niezbędnym do przejścia napisanego testu. Aby w \texttt{NUnit} sprawdź czy został poprawnie rzucony wyjątek należy posłużyć się metodą \texttt{Assert.Throws}, która jako argument przyjmuje delegat będący wywołaniem testowanej metody:
+\begin{lstlisting}
+[Test]
+public void PopElementShouldThrowAnException()
+{         
+	Assert.Throws<System.InvalidOperationException>(() => customStack.Pop());
+}
+\end{lstlisting}
+Testy powinny się zakończyć powodzeniem.
+
+Następnie dodaj kolejny test (zakończy się on niepowodzeniem), sprawdzający czy po wrzuceniu i zdjęciu elementu ze stosu kolekcja jest pusta:
+\begin{lstlisting}
+[Test]
+public void OnePushOnePopShouldBeEmpty()
+{
+	customStack.Push(0);
+	customStack.Pop();
+	Assert.IsTrue(customStack.IsEmpty());
+}
+\end{lstlisting}
+% Zostanie wygenerowany wyjątek ponieważ metoda Pop() nie robi nic więcej, jak tylko rzuca \texttt{InvalidOperationException}.
+
+Aby powyższy test został wykonany pomyślnie można zaproponować następująca wersję metody \texttt{Pop()}:
+\begin{lstlisting}
+public int Pop()
+{
+	if(this.IsEmpty()) { throw new InvalidOperationException(); }
+	this.isEmpty = true
+	return -1;
+}
+\end{lstlisting}
+
+Oczywiście powyższe rozwiązanie już na pierwszy rzut oka jest złe. Jaki testy mógłby pomóc pokazać, błędną implementację? Analogicznie utwórz test \texttt{TwoPushesOnePopShouldNotBeEmpty()}. Musi on zakończyć się niepowodzeniem. W klasie \texttt{CustomStack} dodaj pole \texttt{counter}, które przejmie role \texttt{isEmpty}. Przy umieszczaniu elementu na stosie, inkrementuj licznik, przy zdejmowaniu dekrementuj. Doprowadź klasę \texttt{CustomStack} do takiego stanu, aby przechodziłą napisany wcześniej test.
+
+Kolejny test niech sprawdza czy po umieszczaniu elementu na stosie i zdjęciu go zwracana jest ta sama wartość:
+\begin{lstlisting}
+[TestCase(-10)]
+[TestCase(0)]
+[TestCase(10)]
+public void OnePopOnePushShouldReturnPoppedElement(int element)
+{
+	customStack.Push(element);
+	Assert.AreEqual(element, customStack.Pop());
+}
+\end{lstlisting}
+Zwróć uwagę, że został wykorzystany inny atrybut dla testu. Użycie \texttt{TestCase} pozwala na automatyczne wykonanie testu z różnymi argumentami, w tym przypadku zostaną wykonane trzy testy z wartościami odpowiednio: \texttt{-10,0,10}. Dodaj do klasy \texttt{CustomStack} prywatne pole \texttt{element} i przypisuj mu wartość w~metodzie \texttt{Push()} i~zwracaj go w metodzie \texttt{Pop()}. Uruchom testy, powinny zakończyć się pomyślnie.
+
+Na koniec dodaj ostatni test \texttt{TwoPopTwoPushShouldReturnPoppedElement}. I zmień implementację klasy \texttt{CustomStack} tak aby test zakończył się powodzeniem. Konieczne będzie dodanie tablicy typu \texttt{int[]}.
+
+%\texttt{POCO} - Plain Old \%Insert_Your_Language\% Object. A type with no logic in it. It just stores data in memory. You'd usually see just auto properties in it, sometimes fields and constructors.
+%\texttt{Domain object} an instance of a class that is related to your domain. I would probably exclude any satellite or utility objects from domain object, e.g. in most cases, domain objects do not include things like logging, formatting, serialisation, encryption etc - unless you are specifically building a product to log, serialise, format or encrypt respectively.
+%\texttt{Model object} I think is the same as Domain object. Folks tend to use this interchangeably (I can be wrong)
+%\texttt{Entity} a class that has id
+%\texttt{Repository} a class that speaks to a data storage from one side (e.g. a database, a data service or ORM) and to the service, UI, business layer or any other requesting body. It usually hides away all the data-related stuff (like replication, connection pooling, key constraints, transactions etc) and makes it simple to just work with data
+%\texttt{Service} software that provides some functionality usually via public API. Depending on the layer, it can be for example a RESTful self-contained container, or class that allows you to find a particular instance of needed type.
+
+\subsection{Moq}
+Moq jest frameworkiem do konstruowania mockerów, które mogą być wstrzykiwane do testowanych klas. Framework jest darmowy, posiada licencję BSD 3-Clause. Podobnie jak NUnit jest prosty i~pomaga znaczącą uprościć proces testowania.
+
+
+We frameworku Moq można tworzyć mockery, które będą implementowały składowe określone w interfejsie albo będą przesłaniać metody wirtualne lub abstrakcyjne. Załóżmy, że posiadamy następujący interfejs:
+\begin{lstlisting}
+	public interface IFoo
+	{
+		Bar Bar { get; set; }
+		string Name { get; set; }
+		int Value { get; set; }
+		bool DoSomething(string value);
+		bool DoSomething(int number, string value);
+		Task<bool> DoSomethingAsync();
+		string DoSomethingStringy(string value);
+		bool TryParse(string value, out string outputValue);
+		bool Submit(ref Bar bar);
+		int GetCount();
+		bool Add(int value);
+	}
+\end{lstlisting}
+
+Utworzenie mockera odbywa się w następujący sposób:
+\begin{lstlisting}
+	var mock = new Mock<IFoo>();
+\end{lstlisting}
+Zazwyczaj robi się to w konstruktorze klasy testującej, w osobnym projekcie zawierającym testy jednostkowe.
+
+Następnie taki mocker może zostać ,,wstrzyknięty'' do testowanej klasy np. przez konstruktor. Zakładamy, że testowana klasa korzysta z obiektu implementującego \texttt{IFoo}.
+
+Dalej w metodach testujących należy odpowiednio ustawić zachowanie mockera. Np. jeśli chcemy, aby obiekt po wywołaniu przez badaną klasę metody \texttt{GetCount} zwrócił wartość \texttt{0} należy go skonfigurować w~następujący sposób:
+\begin{lstlisting}
+	mock.Setup(foo => foo.GetCount()).Returns(() => 0);
+\end{lstlisting}
+
+W przypadku chęci określenia zwracanej wartości jedynie dla konkretnego argumentu należy ten argument podać podczas konfigurowania mockera:
+\begin{lstlisting}
+	mock.Setup(foo => foo.DoSomething("ping")).Returns(true);
+\end{lstlisting}
+
+Można również określić, zachowanie mockera dla dowolnego argumentu danego typu albo dodatkowo podać wyrażenie lambda, które stanie się warunkiem zwrócenia danej wartości
+\begin{lstlisting}
+	mock.Setup(foo => foo.DoSomething(It.IsAny<string>())).Returns(true);
+	mock.Setup(foo => foo.DoSomething(It.Is<string>(x=>x.StartsWith("S")))).Returns(true);
+\end{lstlisting}
+
+Istnieje też możliwość określenie przedziału wartości argumentu:
+\begin{lstlisting}
+	mock.Setup(foo => foo.Add(It.IsInRange<int>(0, 10, Range.Inclusive))).Returns(true); 
+\end{lstlisting}
+
+Jeśli zależy nam, aby wywołana metody zgłosiła wyjątek, należy użyć metody \texttt{Throws}:
+\begin{lstlisting}
+	mock.Setup(foo => foo.DoSomething(string.Empty)).Throws<InvalidOperationException>();
+\end{lstlisting}
+
+W analogiczny sposób jak w przypadku metod można konfigurować właściwości, albo użyć metody \texttt{SetupProperty}, która dodatkowo będzie śledzić liczbę wywołań akcesorów:
+\begin{lstlisting}
+	mock.Setup(foo => foo.Name).Returns("bar");
+	// or
+	mock.SetupProperty(f => f.Name, "foo");
+	
+	mock.Verify(foo => foo.Name, Times.Once());
+\end{lstlisting}
+
+Wykorzystując Moq można również ustawić zdarzenia generowane przez ,,mockowaną'' klasę:
+\begin{lstlisting}
+	mock.Setup(foo => foo.Submit()).Raises(f => f.Sent += null, EventArgs.Empty);
+	mock.Raise(m => m.FooEvent += null, new FooEventArgs(fooValue));
+	
+	// Raise passing the custom arguments expected by the event delegate
+	mock.Raise(foo => foo.MyEvent += null, 25, true);
+\end{lstlisting}
+
+Jeśli chcemy przechować argumenty, które testowana klasa przekazuje do obiektu mocker'a albo policzyć liczbę wywołań danej metody mocker'a można skorzystać z metody \texttt{Callback}:
+\begin{lstlisting}
+	var calls = 0;
+	var callArgs = new List<string>();
+	
+	// alternate equivalent generic method syntax
+	mock.Setup(foo => foo.DoSomething(It.IsAny<string>()))
+	.Callback<string>(s => callArgs.Add(s))
+	.Returns(true);
+	
+	// access arguments for methods with multiple parameters
+	mock.Setup(foo => foo.DoSomething(It.IsAny<int>(), It.IsAny<string>()))
+	.Callback<int, string>((i, s) => callArgs.Add(s))
+	.Returns(true);
+	
+	mock.Setup(foo => foo.DoSomething("ping"))
+	.Callback(() => calls++)
+	.Returns(true);
+\end{lstlisting}
+
+\subsubsection{Zadanie 2}
+Analogicznie jak w poprzednim zadaniu utwórz dwa projekty. Jeden typu \texttt{Class Library} o~nazwie \texttt{WebApi}, drugi natomiast zawierający testy jednostkowe \texttt{WebApiUnitTests}. 
+
+Do \texttt{WebApi} dodaj klasę \texttt{CustomerDto} oraz rekord \texttt{CustomerEntity} i \texttt{Address} w dwóch osobnych plikach.
+% DTOs are what gets passed to the infrastructure code that implements the commands and the queries at the boundary of the application.
+\begin{lstlisting}[caption = Klasa \texttt{CustomerDto}]
+public class CustomerDto
+{
+	public string Id { get; set; }
+	public string FirstName { get; set; }
+	public string LastName { get; set; }
+	public string Age { get; set; }
+	public string City { get; set; }
+	public string Street { get; set; }
+	public string ZipCode { get; set; }
+	public string PhoneNumber { get; set; }
+}
+\end{lstlisting}
+\begin{lstlisting}[caption = Rekord \texttt{Address}]
+public record Address(string Street, string City, string ZipCode);
+\end{lstlisting}
+\begin{lstlisting}[caption = Rekord \texttt{CustomerEntity}]
+public record CustomerEntity(string FirstName, string LastName, Address Address);
+\end{lstlisting}
+
+% Repository is responsible for turning persisted data back to entities (models) and vice versa. 
+Następnie dodaj do projektu interfejs o nazwie \texttt{ICustomerRepository} z jedną metodą zwracającą obiekt \texttt{CustomerDto} i przyjmujący argument typu \texttt{Guid}. Wcześniej dodaj przestrzeń nazw \texttt{System}.
+\begin{lstlisting}[caption = Interfejs \texttt{ICustomerRepository}]
+public interface ICustomerRepository
+{
+	CustomerDto GetById(Guid id);
+}
+\end{lstlisting}
+Zakładamy, że repozytoria wykorzystywane w programie będą implementowały ten interfejs. Serwisy natomiast otrzymają instancję tego obiektu przekazaną przez konstruktor. Będą one wykorzystywały repozytoria to pobierania obiektów. 
+
+Dodatkowo dodaj statyczną klasę \texttt{Mapper}, która będzie odpowiadać za konwersję obiektu DTO na obiekt domenowy:
+\begin{lstlisting}[caption = Interfejs \texttt{ICustomerRepository}]
+static class Mapper
+{
+	public static CustomerEntity MapDtoToEntity(CustomerDto entity)
+	{
+		return new CustomerEntity
+		(
+			FirstName : entity.FirstName,
+			LastName : entity.LastName,
+			Address : new Address
+			(
+				City : entity.City,
+				Street : entity.Street,
+				ZipCode : entity.ZipCode
+			)
+		);
+	}
+}
+\end{lstlisting}
+
+Na koniec dodaj plik \texttt{CustomerService.cs} z następującym kodem:
+\begin{lstlisting}
+public class CustomerService
+{
+	private readonly ICustomerRepository customerRepository;
+	public CustomerService(ICustomerRepository customerRepository) => this.customerRepository = customerRepository;
+	
+	public CustomerEntity GetById(Guid customerId)
+	{
+		var customer = this.customerRepository.GetById(customerId);
+		
+		if(customer == null)
+		{
+			return null;
+		}
+		
+		return Mapper.MapDtoToEntity(customer);
+	}
+}
+\end{lstlisting}
+Ten serwis mógłby być wykorzystywany np. przez kontroler do korzystania ze zdalnego repozytorium. 
+
+Załóżmy teraz, że chcemy przetestować klasę \texttt{CustomerService}. Aby ją utworzyć konieczne jest przekazanie obiektu implementującego \texttt{ICustomerRepository}. Nie chcąc używać rzeczywistego obiektu wykorzystującego bazy danych, należy użyć mocker'a.  
+
+Dodaj do projektu \texttt{WebApiUnitTests} za pomocą menadżera pakietów NuGet pakiet \texttt{Moq}. Następnie dodaj do klasy z testami dyrektywę \texttt{using Moq}, aby móc skorzystać z przed chwilą utworzonego pakietu. 
+
+W klasie tej dodaj prywatne pola: \texttt{CustomerService suite} oraz \texttt{private Mock<ICustomerRepository> customerRepoMock = new();}.  Następnie w metodzie \texttt{Setup()} (z atrybutem \texttt{[SetUp]}) przypisz do pola \texttt{suite} instancję obiektu \texttt{CustomerService} przekazując jako argument konstruktora obiekt mocker'a:
+\begin{lstlisting}
+[SetUp]
+public void Setup() => this.suite = new CustomerService(customerRepoMock.Object);
+\end{lstlisting}
+
+Teraz dodaj pierwszą metodą testującą o nazwie \texttt{GetById\_ShouldReturnCustomerWhenExists}. Stwórz obiekt typu \texttt{CustomerDto} z przykładowymi wartościami jego właściwości. Skonfiguruj w tej samej metodzie obiekt mocker'a, tak aby na wywołanie metody \texttt{GetById} z dowolnym argumentem typu \texttt{Guid} zwracał stworzony wcześniej obiekt typu \texttt{CustomerDto}:
+\begin{lstlisting}
+[Test]
+public void GetById_ShouldReturnCustomerWhenExists()
+{
+	var customerId = Guid.NewGuid();
+	var customerName = "Pierre Simon De Laplace";
+	var customerCity = "Gdansk";	
+	var customerDto = new CustomerDto
+	{
+		Id = customerId.ToString(),
+		FirstName = customerName,
+		City = "Gdansk"
+	};
+	this.customerRepoMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(customerDto);
+	
+	//...
+}
+\end{lstlisting}
+
+Następnie wywołaj metodę \texttt{GetById} obiektu, który jest testowany z dowolnym argumentem typu \texttt{Guid}. Przypisz zwracany przez tę metodę obiekt to zmiennej. Za pomocą asercji sprawdź poprawność zwróconych danych:
+\begin{lstlisting}
+Assert.AreEqual(customerName, customer.FirstName);
+Assert.AreEqual(customerCity, customer.Address.City);
+\end{lstlisting}
+
+Dodaj teraz kolejny test o nazwie \texttt{GetById\_ShouldReturnCustomerWhenNotExists} i zaimplementuj test, który sprawdzi czy w przypadku zwrócenia przez repozytorium wartości \texttt{null} metoda \texttt{GetById} również zwróci \texttt{null}. 
+\begin{lstlisting}
+[Test]
+public void GetById_ShouldReturnCustomerWhenNotExists()
+{
+	// Arrange
+	var customerId = Guid.NewGuid();
+	this.customerRepoMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(() => null);
+	
+	// Act
+	var customer = suite.GetById(customerId);
+	
+	//Assert
+	Assert.IsNull(customer);
+}
+\end{lstlisting}
