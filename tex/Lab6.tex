@@ -33,3 +33,212 @@ W kontekście refaktoryzacji często pojawia się słowo ,,zapach'' kodu. ,,Zapa
 	\item Odmowa przyjęcia spadku - ma miejsce, gdy klasy pochodne, korzystają jedynie z części składowych klasy rodzica. Może to świadczyć o źle zaprojektowanej hierarchii klas. Nie zawsze ten ,,zapach'' oznacza coś złego, często można spotkać się z sytuacją w której tworzy się klasę pochodną, aby wykorzystać tylko fragment klasy bazowej. 
 \end{itemize}
 
+\subsubsection{Zadanie 1}
+Przeprowadź refaktoryzację poniższej metody:
+\begin{lstlisting}[caption={Metoda \texttt{Statement}}]
+static string Statement(Invoice invoice, Dictionary<string, Play> plays)
+{
+	var totalAmount = 0;
+	var volumeCredits = 0;
+	var results = $"Rachunek dla {invoice.customer}";
+	
+	CultureInfo pl = new CultureInfo("pl-PL");
+	
+	foreach (var perf in invoice.performance)
+	{
+		var play = plays[perf.playID];
+		var thisAmount = 0;
+		
+		switch (play.Type)
+		{
+			case "tragedia":
+			thisAmount = 40000;
+			if (perf.audience > 30)
+			{
+				thisAmount += 1000 * (perf.audience - 30);
+			}
+			break;
+			case "komedia":
+			thisAmount = 30000;
+			if (perf.audience > 20)
+			{
+				thisAmount += 10000 + 500 * (perf.audience - 20);
+			}
+			thisAmount += 300 * perf.audience;
+			break;
+			default:
+			throw new ArgumentException($"Nieznany typ przedstawienia: ${play.Type}");
+		}
+		
+		// Award bonus points
+		volumeCredits += Math.Max(perf.audience - 30, 0);
+		// Award an additional promotional point for every 5 viewers of the comedy
+		if ("komedia" == play.Type)
+		{
+			volumeCredits += (int)Math.Floor((decimal)perf.audience / 5);
+		}
+		
+		// Create statement row
+		results += $"{play.Name}: {(thisAmount / 100).ToString("c", pl)} (liczba miejsc: {perf.audience}" + Environment.NewLine;
+		totalAmount += thisAmount;
+	}
+	
+	results += $"Naleznosc: {(totalAmount / 100).ToString("c", pl)}" + Environment.NewLine;
+	results += $"Punkty promocyjne: {volumeCredits}";
+	
+	return results;
+}
+\end{lstlisting}
+,gdzie:
+\begin{lstlisting}[caption={plays.json}]
+{
+	"hamlet": {
+		"Name": "Hamlet",
+		"Type": "tragedia"
+	},
+	"as-like": {
+		"Name": "Jak wam sie podoba",
+		"Type": "komedia"
+	},
+	"othello": {
+		"Name": "Otello",
+		"Type": "tragedia"
+	}
+}
+\end{lstlisting}
+oraz
+\begin{lstlisting}[caption={invoices.json}]
+{
+	"customer": "BigCo",
+	"performance": [
+	{
+		"playID": "hamlet",
+		"audience": 55
+	},
+	{
+		"playID": "as-like",
+		"audience": 35
+	},
+	{
+		"playID": "othello",
+		"audience": 40
+	}
+	]
+}
+\end{lstlisting}
+
+Dodaj do projektu trzy pliki z następującymi deklaracji klas:
+\begin{lstlisting}[caption={Performance.cs}]
+public class Performance
+{
+	[JsonProperty("playID")]
+	public string PlayID { get; set; }
+	[JsonProperty("audience")]
+	public int Audience { get; set; }
+}
+\end{lstlisting}
+\begin{lstlisting}[caption={Invoice.cs}]
+public class Invoice
+{
+	[JsonProperty("customer")]
+	public string Customer { get; set; }
+	[JsonProperty("performance")]
+	public List<Performance> Performance { get; set; }
+}
+\end{lstlisting}
+oraz
+\begin{lstlisting}[caption={Play.cs}]
+public class Play
+{
+	[JsonProperty("name")]
+	public string Name { get; set; }
+	[JsonProperty("type")]
+	public string Type { get; set; }
+}
+\end{lstlisting}
+
+Sprawdź zwracany wynik funkcji \texttt{Statement} w metodzie \texttt{Main}:
+\begin{lstlisting}[caption={Play.cs}]
+static void Main(string[] args)
+{
+	Dictionary<string, Play> plays = JsonConvert.DeserializeObject<Dictionary<string, Play>>(File.ReadAllText(@".\plays.json"));
+	Invoice invoice = JsonConvert.DeserializeObject<Invoice>(File.ReadAllText(@".\invoices.json"));
+	
+	Console.WriteLine(Statement2(invoice, plays));
+}
+\end{lstlisting}
+
+W pierwszym kroku dokonaj ekstrakcji wyrażenia \texttt{switch} zaznaczając całe wyrażenie i wciskając \texttt{Alt+Enter} i wybierając opcję \texttt{Extract local function}, nazwij tę funkcję \texttt{AmountFor}. Zamiast tworzyć zmienną \texttt{thisAmount} i przypisywać jej najpierw wartość zero, przypisz jej od razu zwracaną wartość przez \texttt{AmountFor}. Zmień za pomocą \texttt{Alt+Enter} nazwę zmiennej \texttt{thisAmount} na nazwę bardziej odpowiednią informującą, że jest to wartość zwracana przez tę funkcję. Parametr \texttt{perf} również nie jest jasny, zmień go na bardziej opisowy.
+
+Wewnątrz metody \texttt{Statement} dodaj funkcję lokalną:
+\begin{lstlisting}[caption={Dodanie wyrażenia \texttt{GetPlay}}]
+static string Statement(Invoice invoice, Dictionary<string, Play> plays)
+{
+	//...
+	Play GetPlay(Performance perf) => plays[perf.PlayID];	
+}
+\end{lstlisting}
+
+Wykonaj wchłonięcie funkcji, zmieniając wszystkie wykorzystania zmiennej \texttt{play} na wywołanie metody \texttt{GetPlay(perf)}. Usuń zmienną \texttt{play}. Analogicznie usuń parametr lokalnej funkcji \texttt{AmountFor}, wykonując zmianę deklaracji funkcji. Możesz w tym celu wykorzystać narzędzie refaktoryzacyjne w Visual Studio. 
+
+Refaktoryzację Wchłonięcie Zmiennej wykonaj również dla \texttt{thisAmount}, zamień ją wywołaniem funkcji lokalnej \texttt{AmountFor}. Usuń zmienną \texttt{thisAmount}.
+
+Wyodrębnij fragment kodu odpowiedzialny za liczenie rabatu:
+\begin{lstlisting}
+static string Statement(Invoice invoice, Dictionary<string, Play> plays)
+{
+	//...
+	int VolumeCreditsFor(Performance perf)
+	{
+		var valumeCredits = 0;
+		// Award bonus points
+		valumeCredits += Math.Max(perf.Audience - 30, 0);
+		// Award an additional promotional point for every 5 viewers of the comedy
+		if ("komedia" == GetPlay(perf).Type)
+		{
+			valumeCredits += (int)Math.Floor((decimal)perf.Audience / 5);
+		}
+		
+		return valumeCredits;
+	}	
+}
+\end{lstlisting}
+Dokonaj zmian w pętli \texttt{foreach} tak, aby do zmiennej \texttt{volumeCredits} była dodawana wartość zwracana przez funkcję \texttt{VolumeCreditsFor}. Zmień nazwy zmiennych wewnątrz funkcji \texttt{VolumeCreditsFor} na bardziej opisowe. 
+
+
+Analogicznie wyodrębnij funkcję formatującą waluty:
+\begin{lstlisting}
+static string Statement(Invoice invoice, Dictionary<string, Play> plays)
+{
+	//...
+	string FormatAsPLN(int aNumber) => (aNumber/100).ToString("c", new CultureInfo("pl-PL"));
+}	
+
+\end{lstlisting}
+oraz zmień miejsca, gdzie były formatowane waluty na wywołanie lokalnej funkcji \texttt{FormatAsPLN}.
+
+Teraz, aby wchłonąć zmienną \texttt{volumeCredits} zastosuj Podział pętli. 
+\begin{lstlisting}
+static string Statement(Invoice invoice, Dictionary<string, Play> plays)
+{
+	//...	
+	
+	foreach (var perf in invoice.Performance)
+	{
+		// Create statement row
+		results += $"{GetPlay(perf).Name}: {PolishZloty((AmountFor(perf)))} (liczba miejsc: {perf.Audience}" + Environment.NewLine;
+		totalAmount += AmountFor(perf);
+	}
+	
+	foreach (var perf in invoice.Performance)
+	{
+		volumeCredits += VolumeCreditsFor(perf);
+	}
+	
+	//...
+}
+\end{lstlisting}
+Następnie przenieś pętle w której wykonywane jest liczenie rabatu to osobnej funkcji lokalnej wraz ze zmienną lokalną \texttt{volumeCredits}. Teraz usuń w funkcji \texttt{Statement} zmienną \texttt{volumeCredits} i w miejscu jej użycia umieść wywołanie utworzonej przed chwilą funkcji lokalnej. Wykonaj analogiczną refaktoryzację ze zmienną \texttt{totalAmount}.
+
+
+
