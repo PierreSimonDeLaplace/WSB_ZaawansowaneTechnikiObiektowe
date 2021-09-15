@@ -1,42 +1,42 @@
 \section{Refaktoryzacja}
 
-Refaktoryzacja jest procesem zmiany \textbf{działającego} kodu, bez wpływania na jego zachowanie (kod przed i po refaktoryzacji powinien działać tak samo). Poprawie ulegają jego wewnętrzne struktury. Podczas procesu refaktoryzacji kod powinien być cały czas sprawny. 
+Refaktoryzacja jest procesem zmiany \textbf{działającego} kodu, bez wpływania na jego zachowanie (kod przed i~po refaktoryzacji powinien działać tak samo). Poprawie ulegają jego wewnętrzne struktury. Podczas procesu refaktoryzacji kod powinien być cały czas sprawny. 
 
 Refaktoryzacja powinna być naturalną koleją rzeczy podczas rozwijania oprogramowania. Pozwala na zwiększenie czytelności kodu, jest to szczególnie ważne dla kolegów z zespołu jak i nas samych w przyszłości. Refaktoryzacja polepsza projekt, ułatwia jego modyfikowanie i rozszerzanie. Dodatkowo sprawia, że znalezienie błędów staje się prostsze, a samo programowanie szybsze i sprawniejsze.
 % Często jak się zaczyna dany projekt to prace nad nim idą jak burza, dopiero to pewnym czasie następuje stagnacja. Refaktoryzacja pozwala uniknąć tej stagnacji, jeśli projekt jest dobrze rozwijany dodawanie nowych funkcjonalności nie powinno być dużym problemem.  
 
 \subsection{,,Zapachy'' w kodzie}
-W kontekście refaktoryzacji często pojawia się słowo ,,zapach'' kodu. ,,Zapaszki'' sugerują miejsca, gdzie w naszym kodzie może dziać się coś złego. Wskazują fragmenty, które potencjalnie powinny zostać podane refaktoryzacji. W~książce Martin Fowler wyróżnia następujące ,,zapachy'':
+W kontekście refaktoryzacji często pojawia się termin ,,zapach'' kodu. ,,Zapaszki'' sugerują miejsca, gdzie w naszym kodzie może dziać się coś złego. Wskazują fragmenty, które potencjalnie powinny zostać podane refaktoryzacji. W~książce Martin Fowler wyróżnia następujące ,,zapachy'':
 \begin{itemize}
 	\item Tajemnicza nazwa - nazwy metod, klas, pól powinny jasno określać za co dana składowa jest odpowiedzialna. Dzięki narzędziom refaktoryzacyjnym dostępnym w środowiskach IDE, zmiana nazw jest bardzo prosta i warto z niej często korzystać.
-	\item Zduplikowany kod - jeśli fragment kodu pojawia się w dwóch miejscach jego utrzymanie staje się trudne. Konieczne jest pamiętanie o wprowadzaniu zmian w dwóch miejscach, niezbędne jest również czytanie tych samych fragmentów w kilku miejscach.
+	\item Zduplikowany kod - jeśli fragment kodu pojawia się w dwóch miejscach jego utrzymanie staje się trudne. Konieczne jest pamiętanie o wprowadzaniu zmian w dwóch miejscach, niezbędne jest również czytanie tych samych fragmentów w kilku plikach.
 	\item Długa funkcja - im dłuższa jest funkcja tym jej zrozumienie staje się trudniejsze. Warto dekomponować długie metody na kilka mniejszych stosując ekstrakcję funkcji.
 	\item Długa lista parametrów - jeśli funkcja ma wiele parametrów trudniej jest z niej korzystać. Mimo, że współczesne IDE ułatwiają proces wywoływania metod przez wyświetlanie parametrów to funkcje z mniejszą ich liczbą są czytelniejsze. Zmniejszyć listę parametrów można np. przez zebranie funkcji z klasę i stosowanie pól klasy, zamiast parametrów. 
 	\item Dane globalne - stosowania zmiennych globalnych czy klas (singletonów) należy unikać, nie wiadomo kiedy i gdzie zostaną one zmienione. Błędy z nimi związane bardzo ciężko się debuguje. 
 	\item Dane mutowalne - problem z danymi zmiennymi jest podobny do tego z danymi globalnymi. Tam gdzie to możliwe lepiej jest stosować klasy niezmienne. W C\# od wersji 9.0 można korzystać z rekordów.
 	\item Rozbieżne zmiany - powstają w skutek nieprzestrzegania zasady SRP\ref{}. Problemem jest fakt, że wprowadzenie zmiany wymaga modyfikacji w kilku fragmentach kodu, np. zmiana bazy danych pociąga za sobą zmiany w kilku klasach.
-	\item Fala uderzeniowa - jest odwrotnością rozbieżnych zmian. ,,Zapach'' powstaje jeżeli jedna zmiana w programie pociąga za sobą konieczność wielu innych zmian, w innych fragmentach kodu. Jest on podobny do rozbieżnych zmian, które odnoszą się do wielu zmian z pojedynczej klasie, natomiast fala uderzeniowa odnosi się do sytuacji kiedy, jedna zmiana jest wykonywana jednocześnie w wielu klasach. 
+	\item Fala uderzeniowa - jest odwrotnością rozbieżnych zmian. ,,Zapach'' powstaje jeżeli jedna zmiana w~programie pociąga za sobą konieczność wielu innych zmian, w innych fragmentach kodu. Jest on podobny do rozbieżnych zmian, które odnoszą się do wielu zmian z pojedynczej klasie, natomiast fala uderzeniowa odnosi się do sytuacji kiedy, jedna zmiana jest wykonywana jednocześnie w wielu klasach. 
 	\item Zazdrosne funkcjonalności - problem pojawia się, gdy dana metoda odwołuje się w większości do metod z innej klasy. Może to oznaczać, że powinna ona być częścią tej klasy. W takiej sytuacji należy przenieść tę funkcję w miejsce, gdzie bardzie pasuje.
 	\item Stada danych - ,,zapach'' powstaje jeśli pola często występują blisko siebie. Pogrupować je można poprzez ekstrakcję do nowej klasy. 
 	\item Opętanie typami prostymi - często warto zamiast stosować proste typu: \texttt{int}, \texttt{double}, \texttt{bool} itd. zamienić je własnymi typami. Np. nr telefonu lepiej jest umieścić w osobnej klasie, zamiast stosować łańcuchy znaków.
-	\item Powtarzane instrukcje warunkowe - mogą zostać zastąpione polimorfizmem. Klauzule \texttt{if-else} oraz \texttt{swtich-case} często można całkowicie usunąć. W przypadku wielu takich instrukcji warunkowych, może to znacząco poprawić czytelność kodu.
+	\item Powtarzane instrukcje warunkowe - mogą zostać zastąpione polimorfizmem. Klauzule \texttt{if-else} oraz \texttt{switch-case} często można całkowicie usunąć. W przypadku wielu takich instrukcji warunkowych, może to znacząco poprawić czytelność kodu.
 	\item Pętle - zamiast je stosować warto rozważyć użycie potoków. W przypadku C\# dobrym rozwiązaniem jest wykorzystanie wyrażeń LINQ.
 	\item Leniwa klasa - ,,zapach'' występuje jeśli klasa nie wykonuje nic ponad delegowanie zadań do innych klas. Ich rola np. mogła się zmniejszyć w wyniku wcześniejszych refaktoryzacji. 
 	\item Spekulacyjne uogólnienia - pojawia się jeśli kod jest nadmiarowy, zaprojektowany na przypadki, które być może kiedyś wystąpią, tak na wszelki wypadek.
 	\item Pole tymczasowe - przypadek, w którym pewna wartość jest przypisywana do zmiennej tylko w pewnych sytuacjach. Osoba czytająca kod zwykle oczekuje, że obiekt potrzebuje wszystkich swoich zmiennych.
-	\item Łańcuchy komunikatów - pojawia się jeśli klient żąda pewnego obiektu, natomiast ten obiekt żąda innego obiektu, a ten inny obiekt jeszcze innego. Każda zmiana struktury nawigacji wymaga zmian w kodzie klienta.
-	\item Pośrednik - występuje jeśli dana klasa jedyne co robi to deleguje do innych klas. Zamiast korzystać z tej klasy, często lepiej jest odwołać się bezpośrednio do obiektu, który wie co robić.
+	\item Łańcuchy komunikatów - pojawia się jeśli klient żąda pewnego obiektu, natomiast ten obiekt żąda innego obiektu, a ten inny obiekt jeszcze innego. Każda zmiana struktury nawigacji wymaga zmian w~kodzie klienta.
+	\item Pośrednik - występuje jeśli dana klasa jedyne co robi to deleguje do innych klas. Zamiast korzystać z~tej klasy, często lepiej jest odwołać się bezpośrednio do obiektu, który wie co robić.
 	\item Niestosowna bliskość - ma miejsce jeśli dwie klasy wymieniają ze sobą dużą liczbę informacji. Np. jeśli jedna klasa korzysta z klasy danych to być może część tych operacji mogłaby zostać do niej przeniesiona. 
 	\item Duża klasa - ,,zapach'' pojawia się jeśli klasa posiada wiele pól, metod czy linii kodu. Często taka klasa powinna zostać podzielona na kilka mniejszych.
 	\item Alternatywne klasy z różnymi interfejsami - występuje, gdy dwie klasy, które mogłyby być stosowane zamienne, posiadają różne interfejsy. 
-	\item Klasa danych - posiada jedynie pola i metody dostępowe do nich (gettery i settery). Nie posiadają one żadnego dodatkowego zachowania, a klasy kliencie jedynie manipulują na danych z nich zawartych. Wyjątkiem od tej zasady jest oczywiście klasa zwracająca rekord danych.  
+	\item Klasa danych - posiada jedynie pola i metody dostępowe do nich (gettery i settery). Nie posiadają one żadnego dodatkowego zachowania, a klasy kliencie jedynie manipulują na danych w~nich zawartych. Wyjątkiem od tej zasady jest klasa zwracająca rekord danych.  
 	\item Odmowa przyjęcia spadku - ma miejsce, gdy klasy pochodne, korzystają jedynie z części składowych klasy rodzica. Może to świadczyć o źle zaprojektowanej hierarchii klas. Nie zawsze ten ,,zapach'' oznacza coś złego, często można spotkać się z sytuacją w której tworzy się klasę pochodną, aby wykorzystać tylko fragment klasy bazowej. 
 \end{itemize}
 
 \subsubsection{Zadanie 1}
 Przeprowadź refaktoryzację poniższej metody:
 \begin{lstlisting}[caption={Metoda \texttt{Statement}}]
-static string Statement(Invoice invoice, Dictionary<string, Play> plays)
+static string CreateStatement(Invoice invoice, Dictionary<string, Play> plays)
 {
 	var totalAmount = 0;
 	var volumeCredits = 0;
@@ -127,7 +127,7 @@ oraz
 }
 \end{lstlisting}
 
-Dodaj do projektu trzy pliki z następującymi deklaracji klas:
+Dodaj do projektu trzy pliki z następującymi deklaracjami klas:
 \begin{lstlisting}[caption={Performance.cs}]
 public class Performance
 {
@@ -157,50 +157,50 @@ public class Play
 }
 \end{lstlisting}
 
-Sprawdź zwracany wynik funkcji \texttt{Statement} w metodzie \texttt{Main}:
+Sprawdź zwracany wynik funkcji \texttt{CreateStatement} w metodzie \texttt{Main}. Do deserializacji plików JSON wykorzystaj pakiet \texttt{Newtonsoft.Json}, pobierz go z menedżera pakietów NuGet. Dodatkowo dodaj przestrzeń nazw \texttt{System.IO}.
 \begin{lstlisting}[caption={Play.cs}]
 static void Main(string[] args)
 {
 	Dictionary<string, Play> plays = JsonConvert.DeserializeObject<Dictionary<string, Play>>(File.ReadAllText(@".\plays.json"));
 	Invoice invoice = JsonConvert.DeserializeObject<Invoice>(File.ReadAllText(@".\invoices.json"));
 	
-	Console.WriteLine(Statement2(invoice, plays));
+	Console.WriteLine(CreateStatement(invoice, plays));
 }
 \end{lstlisting}
 
-W pierwszym kroku dokonaj ekstrakcji wyrażenia \texttt{switch} zaznaczając całe wyrażenie i wciskając \texttt{Alt+Enter} i wybierając opcję \texttt{Extract local function}, nazwij tę funkcję \texttt{AmountFor}. Zamiast tworzyć zmienną \texttt{thisAmount} i przypisywać jej najpierw wartość zero, przypisz jej od razu zwracaną wartość przez \texttt{AmountFor}. Zmień za pomocą \texttt{Alt+Enter} nazwę zmiennej \texttt{thisAmount} na nazwę bardziej odpowiednią informującą, że jest to wartość zwracana przez tę funkcję. Parametr \texttt{perf} również nie jest jasny, zmień go na bardziej opisowy.
+W pierwszym kroku dokonaj ekstrakcji wyrażenia \texttt{switch} zaznaczając całe wyrażenie i wciskając \texttt{Alt+Enter} i wybierając opcję \texttt{Extract local function}, nazwij tę funkcję \texttt{AmountFor}. Zamiast tworzyć zmienną \texttt{thisAmount} i przypisywać jej najpierw wartość zero, przypisz jej od razu zwracaną wartość przez \texttt{AmountFor}. Zmień za pomocą \texttt{Ctrl+R+R} nazwę zmiennej \texttt{thisAmount} wewnątrz lokalnej funkcji \texttt{AmountFor} na nazwę lepiej ją opisującą. Informującą, że jest to wartość zwracana przez tę funkcję np. \texttt{result}. Nazwa parametru \texttt{perf} również nie jest jasna, zmień ją na bardziej opisową.
 
-Wewnątrz metody \texttt{Statement} dodaj funkcję lokalną:
+Wewnątrz metody \texttt{CreateStatement} dodaj funkcję lokalną \texttt{GetPlay}:
 \begin{lstlisting}[caption={Dodanie wyrażenia \texttt{GetPlay}}]
-static string Statement(Invoice invoice, Dictionary<string, Play> plays)
+static string CreateStatement(Invoice invoice, Dictionary<string, Play> plays)
 {
 	//...
-	Play GetPlay(Performance perf) => plays[perf.PlayID];	
+	Play GetPlay(Dictionary<string, Play> plays, Performance perf) => plays[perf.PlayID];
 }
 \end{lstlisting}
 
-Wykonaj wchłonięcie funkcji, zmieniając wszystkie wykorzystania zmiennej \texttt{play} na wywołanie metody \texttt{GetPlay(perf)}. Usuń zmienną \texttt{play}. Analogicznie usuń parametr lokalnej funkcji \texttt{AmountFor}, wykonując zmianę deklaracji funkcji. Możesz w tym celu wykorzystać narzędzie refaktoryzacyjne w Visual Studio. 
+Wykonaj wchłonięcie funkcji, zmieniając wszystkie wykorzystania zmiennej \texttt{play} na wywołanie metody \texttt{GetPlay(plays, perf)}. Usuń zmienną \texttt{play} z wywołania funkcji \texttt{AmountFor}, a także usuń parametr lokalnej funkcji \texttt{AmountFor}, wykonując zmianę deklaracji funkcji. Możesz w tym celu wykorzystać narzędzie refaktoryzacyjne w Visual Studio. 
 
 Refaktoryzację Wchłonięcie Zmiennej wykonaj również dla \texttt{thisAmount}, zamień ją wywołaniem funkcji lokalnej \texttt{AmountFor}. Usuń zmienną \texttt{thisAmount}.
 
-Wyodrębnij fragment kodu odpowiedzialny za liczenie rabatu:
+Wyodrębnij fragment kodu odpowiedzialny za liczenie rabatu do osobnej funkcji lokalnej:
 \begin{lstlisting}
-static string Statement(Invoice invoice, Dictionary<string, Play> plays)
+static string CreateStatement(Invoice invoice, Dictionary<string, Play> plays)
 {
 	//...
-	int VolumeCreditsFor(Performance perf)
+	int VolumeCreditsFor(Performance aPerformance)
 	{
-		var valumeCredits = 0;
+		var results = 0;
 		// Award bonus points
-		valumeCredits += Math.Max(perf.Audience - 30, 0);
+		results += Math.Max(aPerformance.Audience - 30, 0);
 		// Award an additional promotional point for every 5 viewers of the comedy
-		if ("komedia" == GetPlay(perf).Type)
+		if ("komedia" == GetPlay(plays, aPerformance).Type)
 		{
-			valumeCredits += (int)Math.Floor((decimal)perf.Audience / 5);
+			results += (int)Math.Floor((decimal)aPerformance.Audience / 5);
 		}
 		
-		return valumeCredits;
-	}	
+		return results;
+	}
 }
 \end{lstlisting}
 Dokonaj zmian w pętli \texttt{foreach} tak, aby do zmiennej \texttt{volumeCredits} była dodawana wartość zwracana przez funkcję \texttt{VolumeCreditsFor}. Zmień nazwy zmiennych wewnątrz funkcji \texttt{VolumeCreditsFor} na bardziej opisowe. 
@@ -208,37 +208,244 @@ Dokonaj zmian w pętli \texttt{foreach} tak, aby do zmiennej \texttt{volumeCredi
 
 Analogicznie wyodrębnij funkcję formatującą waluty:
 \begin{lstlisting}
-static string Statement(Invoice invoice, Dictionary<string, Play> plays)
+static string CreateStatement(Invoice invoice, Dictionary<string, Play> plays)
 {
 	//...
 	string FormatAsPLN(int aNumber) => (aNumber/100).ToString("c", new CultureInfo("pl-PL"));
 }	
 
 \end{lstlisting}
-oraz zmień miejsca, gdzie były formatowane waluty na wywołanie lokalnej funkcji \texttt{FormatAsPLN}.
+Zmień kod w miejscach, gdzie były formatowane waluty na wywołanie lokalnej funkcji \texttt{FormatAsPLN}.
 
-Teraz, aby wchłonąć zmienną \texttt{volumeCredits} zastosuj Podział pętli. 
+Teraz, aby wchłonąć zmienną \texttt{volumeCredits} zastosuj Podział pętli - rozdziel jedną pętle na dwie odpowiedzialne odpowiednio za wyliczanie ceny za przedstawienie oraz punktów rabatowych. Możesz również zmienić nazwę zmiennej w pętli \texttt{foreach}.
 \begin{lstlisting}
-static string Statement(Invoice invoice, Dictionary<string, Play> plays)
+static string CreateStatement(Invoice invoice, Dictionary<string, Play> plays)
 {
 	//...	
 	
-	foreach (var perf in invoice.Performance)
+	foreach (var aPerformance in invoice.Performances)
 	{
-		// Create statement row
-		results += $"{GetPlay(perf).Name}: {PolishZloty((AmountFor(perf)))} (liczba miejsc: {perf.Audience}" + Environment.NewLine;
-		totalAmount += AmountFor(perf);
+		results += $"{GetPlay(plays, aPerformance).Name}: {FormatAsPLN(AmountFor(aPerformance))} (liczba miejsc: {aPerformance.Audience}" + Environment.NewLine;
+		totalAmount += AmountFor(aPerformance);
 	}
 	
-	foreach (var perf in invoice.Performance)
+	foreach (var aPerformance in invoice.Performances)
 	{
-		volumeCredits += VolumeCreditsFor(perf);
+		volumeCredits += VolumeCreditsFor(aPerformance);
 	}
 	
 	//...
 }
 \end{lstlisting}
-Następnie przenieś pętle w której wykonywane jest liczenie rabatu to osobnej funkcji lokalnej wraz ze zmienną lokalną \texttt{volumeCredits}. Teraz usuń w funkcji \texttt{Statement} zmienną \texttt{volumeCredits} i w miejscu jej użycia umieść wywołanie utworzonej przed chwilą funkcji lokalnej. Wykonaj analogiczną refaktoryzację ze zmienną \texttt{totalAmount}.
+Następnie przenieś pętle w której wykonywane jest liczenie rabatu to osobnej funkcji lokalnej o nazwie \texttt{TotalVolumeCredits} wraz ze zmienną lokalną \texttt{volumeCredits}. Teraz usuń z funkcji \texttt{CreateStatement} zmienną \texttt{volumeCredits} i w miejscu jej użycia umieść wywołanie utworzonej przed chwilą funkcji lokalnej. Wykonaj analogiczną refaktoryzację ze zmienną \texttt{totalAmount}.
+
+Na ten moment funkcja \texttt{CreateStatement} posiada wiele zagnieżdżonych funkcji. Udało się poprawić czytelność kodu, ale jego funkcjonalność powinna zostać ulepszona. Chcąc zmienić funkcję, aby formatowała wynik np. do formatu HTML konieczne byłoby przekopiowanie dużej części kodu. Spróbujmy rozwiązać ten problem.
+
+Przenieś cały kod metody \texttt{CreateStatement} do osobnej metody (wykonaj Ekstrakcję funkcji) o nazwie \texttt{RenderPlainText}. Teraz utwórz (na razie wewnątrz klasy \texttt{Program}) klasę \texttt{StatementData}, która będzie służyła za pośrednika danych między metodami \texttt{CreateStatement} i \texttt{RenderPlainText}. Sukcesywnie będziemy przenosić kolejne fragmenty kodu z \texttt{RenderPlainText} do \texttt{CreateStatement} rozdzielając odpowiedzialność. W metodzie \texttt{CreateStatement} utwórz obiekt typu \texttt{StatementData} i przekaż go do wnętrza metody \texttt{RenderPlainText}:
+\begin{lstlisting}
+static string CreateStatement(Invoice invoice, Dictionary<string, Play> plays)
+{
+	StatementData statementData = new ();
+	
+	return RenderPlainText(statementData, invoice, plays);
+}
+
+private static string RenderPlainText(StatementData data, Invoice invoice, Dictionary<string, Play> plays)
+{
+	var results = $"Rachunek dla {invoice.Customer}";
+		
+	//...
+}
+
+public class StatementData
+{
+}
+\end{lstlisting}
+
+Do klasy \texttt{StatementData} dodaj publiczne właściwości \texttt{List<Performance> Performances} oraz \texttt{string Customer}. Teraz w funkcji \texttt{CreateStatement} przypisz do obiektu typu \texttt{StatementData} odpowiednie wartości z właściwości obiektu \texttt{invoice}. Wszystkie użycia \texttt{invoice} w metodzie \texttt{RenderPlainText} zamień użyciem nowego obiektu pośredniczącego. Z sygnatury metody \texttt{RenderPlainText} usuń parametr typu \texttt{Invoice}, od teraz wszystkie potrzebne dane będą przekazywane za pomocą obiektu pośredniego:
+\begin{lstlisting}
+public class StatementData
+{
+	public string Customer { get; set; }
+	public List<Performance> Performances { get; set; }
+}
+
+static string CreateStatement(Invoice invoice, Dictionary<string, Play> plays)
+{
+	StatementData statementData = new ();
+	statementData.Customer = invoice.Customer;
+	statementData.Performances = invoice.Performances;
+	
+	return RenderPlainText(statementData, plays);
+}
+
+private static string RenderPlainText(StatementData data, Dictionary<string, Play> plays)
+{
+	var results = $"Rachunek dla {invoice.Customer}";
+	
+	//...
+}
+\end{lstlisting}
+
+Klasa \texttt{Performance} służyła do deserializacji pliku JSON. Wydaje się dobrym pomysłem, aby dodać więcej informacji do klasy opisującej przedstawienia np. obiekt typu \texttt{Play}, cenę za przedstawienie oraz punkty rabatowe. Utwórz osobną klasę \texttt{EnrichedPerformance} w osobnym pliku:
+\begin{lstlisting}
+public class EnrichedPerformance
+{
+	public string PlayID { get; set; }
+	public int Audience { get; set; }
+	public int Amount { get; set; }
+	public Play Play { get; set; }
+	public int VolumeCredits { get; set; }
+}
+\end{lstlisting}
+
+Zamień typ przechowywany w liście \texttt{Performances} klasy \texttt{StatementData} na \texttt{EnrichedPerformance}. Wewnątrz metody \texttt{CreateStatement} utwórz metodę \texttt{EnrichPerformance}, która będzie mapowała obiekt typu \texttt{Performance} na \texttt{EnrichedPerformance}, zawierający większą liczbę informacji:
+\begin{lstlisting}
+EnrichedPerformance EnrichPerformance(Performance performance)
+{	
+	return new()
+	{
+		Audience = performance.Audience,
+		PlayID = performance.PlayID,
+	};
+}
+\end{lstlisting}
+
+Teraz skopiuj do metody \texttt{CreateStatement} metodę lokalną \texttt{GetPlay} (konieczna będzie zmiana typu parametru ponownie na \texttt{Performance}). W lokalnej metodzie \texttt{EnrichPerformance} dodaj przypisanie wartości kolejnej właściwości:
+\begin{lstlisting}
+	EnrichedPerformance EnrichPerformance(Performance performance)
+	{	
+		return new()
+		{
+			Audience = performance.Audience,
+			PlayID = performance.PlayID,
+			Play = GetPlay(plays, performance),
+		};
+	}
+\end{lstlisting}
+Aby przypisać wartość składowej \texttt{Performances} obiektu \texttt{StatementData} możesz posłużyć się metodą \texttt{Select} w następujący sposób:
+\begin{lstlisting}
+	statementData.Performances = invoice.Performances.Select(x => EnrichPerformance(x)).ToList();
+\end{lstlisting}
+
+Z metody \texttt{RenderPlainText} usuń wszystkie odwołania do zmiennej \texttt{Play}, skorzystaj z parametru data typu \texttt{StatementData}. Usuń lokalną metodę \texttt{GetPlay} z \texttt{RenderPlainText}.
+
+Analogicznie dodaj do klasy \texttt{EnrichedPerformance} właściwość \texttt{VolumeCredits} oraz \texttt{AmountFor}. Na koniec dodaj do \texttt{StatementData} dwie właściwości \texttt{TotalAmount} oraz \texttt{TotalVolumeCredits}. Przenieś do metody \texttt{CreateStatement} dwie metody wyliczające sumy t.j.: \texttt{TotalAmount} oraz \texttt{TotalVolumeCredits}. Przy tworzeniu obiektu typu \texttt{StatementData} wykorzystaj je, aby przypisać wartości \texttt{TotalAmount} oraz \texttt{TotalVolumeCredits}.
+
+Zwróć uwagę na widoczny podział metody \texttt{CreateStatement} na cześć tworzącą dane oraz renderującą treść komunikatu. Dodaj teraz metodę \texttt{CreateStatementData} i przenieś do niej cały kod odpowiedzialny za tworzenie obiektu typu \texttt{StatementData}.
 
 
+Dodaj do projektu folder \texttt{Statements}. Przenieś do niego klasę \texttt{EnrichedPerformance} oraz \texttt{StatementData}. Dalej utwórz osobną klasę o nazwie \texttt{Statement} i przenieś do niej metodę \texttt{CreateStatementData}.
 
+Analogicznie utwórz folder \texttt{Render} i utwórz w nim klasę \texttt{Renderer}, przenieś do niej metodę \texttt{RenderPlainText}. 
+
+Następnie do klasy \texttt{Statement} dodaj konstruktor przyjmujący argumenty \texttt{Invoice} oraz \texttt{Dictionary<string, Play>}. Utwórz odpowiednie pola i przypisz im przekazywane do konstruktora argumenty:
+\begin{lstlisting}
+public class Statement
+{
+	private readonly Invoice invoice;
+	private readonly Dictionary<string, Play> plays;
+	
+	public Statement(Invoice invoice, Dictionary<string, Play> plays)
+	{
+		this.invoice = invoice;
+		this.plays = plays;
+	}
+
+	//...
+}
+\end{lstlisting}
+
+Usuń słowo kluczowe \texttt{static} z deklaracji metody \texttt{CreateStatementData} oraz jej argumenty. Od teraz można wykorzystywać prywatne pola \texttt{invoice} i \texttt{plays}. W metodzie \texttt{CreateStatement} w pliku \texttt{Program.cs} konieczne będzie utworzenie instancji klasy \texttt{Statement} jako, że metoda \texttt{CreateStatementData} nie jest już statyczna.
+
+
+Przyszła pora na pozbycie się zagnieżdżonych w metodzie \texttt{CreateStatementData} funkcji. Przenieś je na zewnątrz funkcji, tak aby stały się prywatnymi składowymi klasy \texttt{Statement}. Możesz również pętle w~metodach \texttt{TotalAmount} oraz \texttt{TotalVolumeCredits} zamienić na potok:
+\begin{lstlisting}
+private int TotalAmount(StatementData statementData)
+{
+	var totalAmount = 0;
+	statementData.Performances.ForEach(x => totalAmount += x.Amount);
+	
+	return totalAmount;
+}
+\end{lstlisting}
+
+Problemem, który rzuca się w oczy jest wykorzystanie instrukcji \texttt{switch} w klasie \texttt{Statement}. Wykorzystując polimorfizm można tę niedogodność łatwo poprawić. Utwórz w projekcie folder \texttt{Calculators}, a w nim klasę \texttt{PerformanceCalculator}:
+\begin{lstlisting}
+public class PerformanceCalculator
+{
+	protected readonly Performance performance;
+	public Play Play { get; private set; }
+	
+	public PerformanceCalculator(Performance performance, Play play)
+	{
+		this.performance = performance;
+		this.Play = play;
+	}
+}
+\end{lstlisting}
+Docelowo w klasach pochodnych do \texttt{PerformanceCalculator} umieścimy odpowiednie podklasy dla różnych typów przedstawień. W metodzie \texttt{EnrichPerformance} utwórz instancję tej klasy. Wykorzystaj składową \texttt{Play} klasy \texttt{PerformanceCalculator} podczas tworzenia obiekt typu \texttt{EnrichedPerformance}. 
+
+Przenieś metodę \texttt{AmountFor} do klasy \texttt{PerformanceCalculator} i również wykorzystaj ją przy tworzeniu obiektu typu \texttt{EnrichedPerformance}. Analogicznie postąp z \texttt{VolumeCredits}. 
+
+Teraz zamiast tworzyć obiekt kalkulatora wewnątrz metody \texttt{EnrichPerformance} utwórz metodę fabrykującą \texttt{CreatePerformanceCalculator} w klasie \texttt{Statement} i przenieś do niej proces tworzenia obiektu typu \texttt{PerformanceCalculator}.
+
+Dodaj do folderu \texttt{Calculators} dwie klasy pochodne względem \texttt{PerformanceCalculator}:
+\begin{lstlisting}
+public class TragedyCalculator : PerformanceCalculator
+{
+	public TragedyCalculator(Performance performance, Play play) : base(performance, play){}
+}
+\end{lstlisting}
+oraz
+\begin{lstlisting}
+public class ComedyCalculator : PerformanceCalculator
+{
+	public ComedyCalculator(Performance performance, Play play) : base(performance, play){}
+}
+\end{lstlisting}
+Zamień ciało metody fabrykującej \texttt{CreatePerformanceCalculator}, tak aby tworzyła różne wersje kalkulatora w zależności od typu przedstawienia:
+\begin{lstlisting}
+public static PerformanceCalculator CreatePerformanceCalculator(Performance performance, Play play)
+{
+	switch (play.Type)
+	{
+		case "tragedia":
+			return new TragedyCalculator(performance, play);
+		case "komedia":
+			return new ComedyCalculator(performance, play);
+		default:
+			throw new ArgumentException($"Nieznany typ przedstawienia: ${play.Type}");
+	}
+}
+\end{lstlisting}
+Oznacz klasę \texttt{PerformanceCalculator} jako abstrakcyjną za pomocą słowa kluczowego \texttt{abstract}. Metodę \texttt{AmountFor} oraz \texttt{VolumeCreditsFor} oznacz jako wirtualne (słowo kluczowe \texttt{virtual}). Teraz przenieś fragment odpowiedzialny za liczenie ceny dla komedii z klasy \texttt{PerformanceCalculator} do klasy pochodnej \texttt{ComedyCalculator}. Dalej zrób to samo dla tragedii. Następnie możesz w klasie \texttt{PerformanceCalculator} metodę \texttt{AmountFor} oznaczyć jako abstrakcyjną. To samo powtórz dla metody \texttt{VolumeCreditsFor}. Wykorzystaj te metody w procesie tworzenia obiektu w metodzie \texttt{EnrichPerformance}. Z klasy \texttt{Statement} usuń \texttt{VolumeCreditsFor} oraz \texttt{AmountFor}.
+
+Dodaj do folderu \texttt{Calculators} klasę \texttt{FactoryCalculator} i przenieś do niej metodę \texttt{CreatePerformanceCalculator}. 
+
+Utwórz folder \texttt{Utilities} w której umieść klasę \texttt{CurrencyUtilities}, a w niej metodę statyczną:
+\begin{lstlisting}
+public static class CurrencyUtilities
+{
+	public static string FormatAsPLN(int aNumber) => (aNumber / 100).ToString("c", new CultureInfo("pl-PL"));
+}
+\end{lstlisting}
+
+Na koniec utwórz w~folderze \texttt{Render} interfejs:
+\begin{lstlisting}
+public interface IRenderer
+{
+	string Render(StatementData data);
+}
+\end{lstlisting}
+Niech implementuje go klasa \texttt{PlainTextRenderer}. W metodzie \texttt{Main} utwórz zmienną typu \texttt{IRednerer} i~przypisz do niej instancję klasy \texttt{PlainTextRenderer}. Wykorzystaj ją w celu utworzenia oświadczenia:
+\begin{lstlisting}
+static void Main(string[] args)
+{
+	Dictionary<string, Play> plays = JsonConvert.DeserializeObject<Dictionary<string, Play>>(File.ReadAllText(@".\plays.json"));
+	Invoice invoice = JsonConvert.DeserializeObject<Invoice>(File.ReadAllText(@".\invoices.json"));
+	
+	IRenderer renderer = new PlainTextRenderer();
+	Console.WriteLine(renderer.Render(new Statement(invoice, plays).CreateStatementData()));
+}
+\end{lstlisting}
