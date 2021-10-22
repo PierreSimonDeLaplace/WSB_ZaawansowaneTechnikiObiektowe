@@ -25,13 +25,13 @@ Oczywiście należy zawsze mieć na uwadze, że rozdrabniać klasy na coraz mnie
 
 Jako przykład przeanalizujmy interfejs \texttt{IModem}.
 \begin{lstlisting}[caption={Naruszenie zasady SRP}, label={lab1/lst/srpViolationModem}]
-	public interface IModem
-	{
-		public void Dial(string phoneNumber);
-		public void Hangup();
-		public void Send(char c);
-		public char Recieve();
-	}
+public interface IModem
+{
+	public void Dial(string phoneNumber);
+	public void Hangup();
+	public void Send(char c);
+	public char Recieve();
+}
 \end{lstlisting}
 Widać, że interfejs mógłby zostać podzielony na dwa obszary odpowiedzialności. Jeden odpowiadający za nawiązywanie i zrywanie połączeń, drugi natomiast za same funkcje komunikacyjne. Klasy klienckie mogłyby wykorzystywać klasę implementującą dwa interfejsy np. \texttt{IDataChannel} i \texttt{IConnection} i tym samym uzależnić się tylko od jednego z obszarów odpowiedzialności. 
 %Tutaj konieczne jest przeanalizowanie wymagań, ponieważ podział interfejsu na dwa zawierające odpowiednio \texttt{Dial} i \texttt{Hangup} oraz \texttt{Send} i \texttt{Recieve} może nie być potrzebny, jeśli zmiany w aplikacji nie wpływają na zmiany w~metodach zarządzających wykonywaniem połączeń.
@@ -75,7 +75,7 @@ Widać, że interfejs mógłby zostać podzielony na dwa obszary odpowiedzialno�
 
 \subsubsection{Zadanie 1}
 
-Poniżej przedstawiony fragment kodu\cite{adaptatywny_kod_hall} zawiera klasę\ref{lab1/lst/srpViolationEmployee} z metodą \texttt{ProcessTrades}, która wyraźnie narusza zasadę SRP. Utwórz nowy projekt .NET 5.0 i dodaj do niego poniższą klasę w~osobnym pliku \texttt{TradeProcessor.cs}.
+Poniżej przedstawiony fragment kodu\cite{adaptatywny_kod_hall} zawiera klasę\ref{lab1/lst/srpViolationEmployee} z metodą \texttt{ProcessTrades}, która wyraźnie narusza zasadę SRP. Utwórz nowy projekt .NET 5.0 i dodaj do niego poniższą klasę w~osobnym pliku. Nazwij ten plik \texttt{TradeProcessor.cs}.
 
 \begin{lstlisting}[caption={Naruszenie zasady SRP}, label={lab1/lst/srpViolationEmployee}]
 public class TradeProcessor
@@ -540,7 +540,7 @@ W utworzonej przed chwilą klasie dodaj prywatną \textbf{zmienna} typu \texttt{
 
 Dodaj właściwość \texttt{FlatRate} z metodą dostępu \texttt{get} oraz akcesorem \texttt{set}.
 
-Wewnątrz akcesora \texttt{set} dodaj sprawdzenie ustawianej wartości tak jak dla warunków początkowych i końcowych.
+Wewnątrz akcesora \texttt{set} dodaj sprawdzenie ustawianej wartości tak jak dla warunków początkowych i~końcowych.
 \begin{lstlisting}
 public class ShippingStrategy
 {
@@ -561,7 +561,7 @@ public class ShippingStrategy
 Sprawdź działanie powyższego kontraktu z poziomu klienta - metody \texttt{Main}.
 
 
-Zamiast umieszczać kod kontraktów wewnątrz metody, lepiej byłoby utworzyć osobne klasy typu \texttt{Weight} czy \texttt{Size} i~to w~nich dodać powyższe kontrakty. Dodaj do projekt klasy pomocnicze \texttt{Size} oraz \texttt{Weight} w dwóch osobnych plikach:
+Zamiast umieszczać kod kontraktów wewnątrz metody, lepiej byłoby utworzyć osobne klasy typu \texttt{Weight} czy \texttt{Size} i~to w~nich dodać powyższe kontrakty. Dodaj do projekt klasy pomocnicze \texttt{Size} oraz \texttt{Weight} w~dwóch osobnych plikach:
 \begin{lstlisting}
 public class Size
 {
@@ -578,8 +578,7 @@ public class Size
 \begin{lstlisting}
 public class Weight
 {
-	public double Value { get; init; }
-	
+	public double Value { get; init; }	
 	public Weight(double value) => this.Value = value;
 }
 \end{lstlisting}
@@ -589,7 +588,7 @@ W~ten sposób w~całym kodzie kontrakty dla danych typów będą spójne oraz zm
 \subsubsection{Zadanie 4}
 Zbadaj kontrakty w kontekście zasady LSP:
 
-Oznacz metodę \texttt{CalculateShippingCost} jako wirtualną. Utwórz klasę pochodną względem \texttt{ShippingStrategy} i nazwij ją np. \texttt{WorldWideShippingStrategy}. Za pomocą słowa kluczowego \texttt{override} przesłoń wirtualną metodę klasy bazowej i~dodaj w~niej sprawdzenie czy wartość argumentu \texttt{destination} jest \texttt{null}. Warunek ten narusza zasadę LSP mówiącą o tym, że nie wolno zaostrzać warunków początkowych. %dotyczy argumentu destination
+Oznacz metodę \texttt{CalculateShippingCost} jako wirtualną. Utwórz klasę pochodną klasy \texttt{ShippingStrategy} i nazwij ją np. \texttt{WorldWideShippingStrategy}. Za pomocą słowa kluczowego \texttt{override} przesłoń wirtualną metodę klasy bazowej i~dodaj w~niej sprawdzenie czy wartość argumentu \texttt{destination} jest \texttt{null}. Warunek ten narusza zasadę LSP mówiącą o tym, że nie wolno zaostrzać warunków początkowych. %dotyczy argumentu destination
 \begin{lstlisting}
 public class WorldWideShippingStrategy : ShippingStrategy
 {	
@@ -804,7 +803,7 @@ Poniższy interfejs\ref{lab1/lst/ispCrudInterface} zawiera zbiór zapytań i pol
 public interface IPersistence
 {
 	IEnumerable<Entity> GetAll();
-	Item GetByID(Guid identity);
+	Entity GetByID(Guid identity);
 	IEnumerable<Entity> FindByCriteria(string criteria);
 	void Save(Entity entity);
 	void Delete(Entity entity);
@@ -854,7 +853,7 @@ public class Persistence : IPersistence
 	}
 }
 \end{lstlisting}
-Często można natomiast się spotkać z rozdzieleniem operacji odczytu i aktualizacji bazy danych. Przykładem tej koncepcji jest m.in wzorzec CQRS, o którym szerzej będziemy mówić przy okazji czynnościowych wzorców projektowych~\ref{sec/lab4/cqrs}. Na ten moment najprościej ujmując polega on na rozdzieleniu operacji odczytu od operacji aktualizacji, dodawania i~usuwania z/do bazy danych.. 
+Często można natomiast się spotkać z rozdzieleniem operacji odczytu i aktualizacji bazy danych. Przykładem tej koncepcji jest m.in wzorzec CQRS, o którym szerzej będziemy mówić przy okazji czynnościowych wzorców projektowych~\ref{sec/lab4/cqrs}. Na ten moment najprościej ujmując polega on na rozdzieleniu operacji odczytu od operacji aktualizacji, dodawania i~usuwania z/do bazy danych.
 
 Zastanów się jak można podzielić interfejs\ref{lab1/lst/ispCrudInterface} na dwa mniejsze: jeden dla poleceń, drugi dla zapytań. Dwie klasy np. \texttt{CommandsNHibernate} oraz \texttt{QueriesMongo} mogłyby implementować odpowiednio \texttt{ICommands} i~\texttt{IQueries}. Klasa kontrolera w takiej sytuacji mogłaby posiadać referencję do dwóch obiektów implementujących wspomniane interfejsy. Takie podejście pozwala na niezależne korzystanie z dwóch rodzajów baz danych, ich swobodną wymianę i skalowanie. Implementacje mogłyby znajdować się różnych w pakietach co jest dodatkową korzyścią 
 
@@ -937,14 +936,19 @@ Głównie za sposób działania aplikacji odpowiadają moduły wysokopoziomowe. 
 Nie należy postrzegać bibliotek jako właścicieli interfejsów. Interfejsy powinny być powiązane ze swoimi właścicielami i to klasy z innej warstwy powinny implementować te interfejsy. % Lekki wstep o Clean Architecture Taylor'a i o tym jak interfejs opisujacy dostep do bazy danych znajduje sie w warstwie Application, natomiast implementacja w Infrastructure.
 Pozwala to tworzyć oprogramowanie, które jest elastyczne. Jeśli dany zestaw jest wykorzystywany przez kilku klientów np. pobrany pakiet NuGet to warto stworzyć dodatkową warstwę abstrakcji, która umożliwi w~przyszłości zmianę tego pakietu, bez konieczności wprowadzania zmian po stronie klienta. Można to osiągnąć np. stosując wzorzec projektowy Adapter~\ref{sec/lab3/adapter}, który zostanie omówiony na przyszłych zajęciach. Oczywiście jeśli mamy do czynienia z klasami, które są zmieniane bardzo rzadko, albo mamy wysoki poziom zaufania to autorów to uzależnienie się od nich nie jest czymś złym. Ciężko znaleźć sens, tworzenia dodatkowej warstwy pośredniej do komunikowania się np. z~klasą \texttt{string}.
 
-Wyobraźmy sobie przykład dwóch klas \texttt{Button} oraz \texttt{Lamp}. Klasa przycisku ma możliwość sterowania lampą. W~najprostszej, naiwnej implementacji można by dodać pole w klasie \texttt{Button} przechowujące referencje do obiektu lampy. \texttt{Lamp} mógłby być przekazywany np. jako argument konstruktora. Dlaczego te podejście jest złe i łamie zasadę DIP? \texttt{Button} będący wysokopoziomową abstrakcją, jest uzależniony od niskopoziomowego obiektu lampy.
+Jako przykład zastosowania zasady DIP wyobraźmy sobie dwie klasy \texttt{Button} oraz \texttt{Lamp}. Klasa przycisku ma możliwość sterowania lampą. W~najprostszej, naiwnej implementacji można by dodać pole w klasie \texttt{Button} przechowujące referencje do obiektu lampy. \texttt{Lamp} mógłby być przekazywany np. jako argument konstruktora. Dlaczego te podejście jest złe i łamie zasadę DIP? \texttt{Button} będący wysokopoziomową abstrakcją, jest uzależniony od niskopoziomowego obiektu lampy.
 
-Powyższy problem można rozwiązać przez dodanie interfejsu np. \texttt{ISwitchableDevice} i~wstrzykiwanie obiektu go implementującego do obiektu \texttt{Button}. Teraz wystarczy, aby \texttt{Lamp} implementował ten interfejs. W~przypadku, kiedy przycisk będzie miał zostać wykorzystany do sterowania np. silnikiem albo piecem wystarczy utworzyć nowy obiekt \texttt{Motor} albo \texttt{Heater}, który będzie implementował \texttt{ISwitchableDevice} i przekazać go do obiektu \texttt{Button}.
+Powyższy problem można rozwiązać przez dodanie interfejsu np. \texttt{ISwitchableDevice} i~wstrzykiwanie obiektu go implementującego do obiektu \texttt{Button}. Teraz wystarczy, aby \texttt{Lamp} implementował ten interfejs. W~przypadku, kiedy przycisk będzie miał zostać wykorzystany do sterowania np. silnikiem albo piecem wystarczy utworzyć nowy obiekt \texttt{Motor} albo \texttt{Heater}, który będzie implementował \texttt{ISwitchableDevice} i~przekazać go do obiektu \texttt{Button}.
 
-% Można narysować kilka warstw: Controllers, Services, Domain oraz NHibernate. Warstwy zależą od siebie w kolejności takiej jak zostały wymienione. Dodatkowo interfejsy przynależą do konkretnej warstwy np. w warstwie Services znajduje się SecurityService oraz ISecurityService. W tym przypadku jeśli skompilujemy np. Conrollers, dalej w katalogu /bin będzie najdował się NHibernate i inne warstwy.
+Na poniższym diagramie UML\ref{lab1/fig/DipUml} pokazano hierarchię klas zgodną z zasadą odwracania zależności. W~tym przypadku interfejsy i implementacje zostały umieszczone w osobnych zestawach. Klienci posiadają referencje jedynie do zestawów z interfejsami. W~idealnym scenariuszu interfejsy nie powinny posiadać żadnych zależności, kod kliencki również. To implementacje powinny zależeć od interfejsów. Klasy zestawu \texttt{Controllers} nie są związane z klasami zestawu \texttt{ServicesImplementations}, a jedynie z abstrakcją w postaci interfejsów zestawu \texttt{ServiceInterfaces}. Analogicznie sytuacja wygląda w przypadku zależności zestawu \texttt{ServicesImplementations} od \texttt{Domain}. Warto zauważyć, że od szczegółu jakim jest wykorzystywany ORM (ang. Object-Relational Mapping)\footnote{Technika, która pozwala na zapytania i polecenia do bazy danych z wykorzystaniem paradygmatów programowania obiektowego. Zazwyczaj pisząc ORM mamy na myśli bibliotekę, która implementuje technikę ORM. Pozwala nam na uniezależnienie się od konkretnej bazy danych, komunikacją z nią odbywa się za pomocą konkretnej biblioteki ORM np. NHiberante czy EntityFramework.} nie zależy żaden moduł wyższego poziomu. Powoduje to, że zmiana tego komponentu nie pociągnie za sobą zmian w kodzie warstw wyższych i nie będzie wymagała ich ponownej kompilacji. 
+%klienci jako klasy, ktore korzystaja z obiektow innych klas, a nie metoda Main. Oczywiscie klasa/kontener IoC musi posiadac referencej, aby moc utworzy dane instancje.
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.9\linewidth]{images/SolidDip}
+	\caption{Diagram UML hierarchii klas zgodnej z regułą DIP\cite{adaptatywny_kod_hall}}
+	\label{lab1/fig/DipUml}
+\end{figure}
 
-Odpowiednim podejściem jest umieszczenie interfejsów oraz ich implementacji w osobnych zestawach. Klienci %klienci jako klasy, ktore korzystaja z obiektow innych klas, a nie metoda Main. Oczywiscie klasa/kontener IoC musi posiadac referencej, aby moc utworzy dane instancje.
-powinny posiadać referencje jedynie do zestawu z interfejsem. W idealnym scenariuszu interfejsy nie powinny posiadać żadnych zależności, kod kliencki również. To implementacje powinny zależeć od interfejsów. 
 \subsubsection{Zadanie 6}
 Przeanalizuj poniższy kod i zmień go tak, aby był zgodny z omawianą zasadą DIP.
 \begin{lstlisting}
@@ -1014,7 +1018,7 @@ public CustomerData GetCustomerData(string customerNumber)
 \end{lstlisting}
 Wykorzystując kontener IoC można zarejestrować zależności, które będą tworzone i wstrzykiwane automatycznie. Jeśli dana klasa potrzebuje np. obiektu implementującego \texttt{ILogWriter}, kontener utworzy odpowiednią instancję pod warunkiem, że została ona wcześniej zarejestrowana. Jeżeli np. tym obiektem jest \texttt{LogWriter} i wymaga on ścieżki do pliku, można również taką ścieżkę zarejestrować jako wartość klucza w~\texttt{AppSettings}. Kontener ,,wie'' jakie obiekty, jakich typów muszą być utworzone i wstrzyknięte, aby spełnić wymagania tworzonej klasy. Jeśli odpowiedni obiekt nie został wcześniej zarejestrowany to zostanie zgłoszony wyjątek o~tym informujący. Dodatkowo kontenery umożliwiają sprecyzowanie czy jedna i ta sama instancja ma zostać przekazana do wszystkich obiektów, które jej potrzebuje czy np. za każdym razem powinien być tworzony nowy obiekt.
 
-Kontenery IoC powinny być wykorzystywane jedynie do wiązania poszczególnych elementów programu. Jeśli chcemy tworzyć obiekty podczas działania programu należy wykorzystywać fabryki. Trzeba unikać sytuacji w~których w~całym programie znajdują się referencje do kontenera. Zazwyczaj wystarcza jedno pobranie obiektu np. typu \texttt{Application}, natomiast reszta powiązań powinna odbywać się po stronie kontenera IoC.
+Kontenery IoC powinny być wykorzystywane jedynie do wiązania poszczególnych elementów programu. Jeśli chcemy tworzyć obiekty podczas działania programu należy wykorzystywać fabryki\ref{sec/lab2/abstractFactory}. Trzeba unikać sytuacji w~których w~całym programie znajdują się referencje do kontenera. Zazwyczaj wystarcza jedno pobranie obiektu np. typu \texttt{Application}, natomiast reszta powiązań powinna odbywać się po stronie kontenera IoC.
 
 \subsubsection{Zadanie 7}\label{lab1/ex/IoC}
 Utwórz dwa projekty w solucji. Jeden niech będzie biblioteką, drugi natomiast aplikacją konsolową. Dodaj referencję do biblioteki w aplikacji konsolowej. Aby to zrobić kliknij PPM na projekt aplikacji konsolowej, dalej \texttt{Add} i \texttt{Project Reference...}, następnie wskaż odpowiedni zestaw. W~projekcie biblioteki utwórz następującą hierarchię klas pokazaną na rysunku\ref{lab1/fig/IoC}.
@@ -1040,8 +1044,8 @@ Zaimplementuj metody tak, aby wypisywały informację na konsoli o tym jaka meto
 \begin{lstlisting}
 public class DataProvider : IDataProvider
 {
-	public void GetData() => Console.WriteLine("Loading the data");
-	public void SetData() => Console.WriteLine("Saving the data");
+	public void GetData() => Console.WriteLine("Data downloading...");
+	public void SetData() => Console.WriteLine("Data saving...");
 }
 \end{lstlisting}
 
@@ -1097,10 +1101,104 @@ Uruchom program i sprawdź, czy kontener poprawnie powiązał i stworzył wszyst
 
 W momencie wywołania \texttt{Resolve} kontener sprawdza jakiego typu obiekty należy przekazać do konstruktora obiektu i wstrzykuje je za nas. W naszym przypadku po wywołaniu metody \texttt{Resolve<IApplication>} kontener ,,widzi'', że wymagany jest obiekt implementujący \texttt{IBusinessLogic}, aby utworzyć \texttt{Application}. Dalej \texttt{BusinessLogic} wymaga przekazania obiektu implementującego \texttt{ILogger} oraz \texttt{IDataProvider}. I~w~tym przypadku zostaną za nas utworzone odpowiednie obiekty i przekazane do \texttt{BusinessLogic} tak, aby mógł on zostać stworzony na potrzeby \texttt{Application}.
 
-Aby ułatwić proces wiązania danych obiektów, można zamiast rejestrować poszczególne typy, zarejestrować cały zestaw wraz z określeniem pewnym warunków. Np. można zarejestrować wszystkie obiekty z~zestawu, których nazwy zaczynają się danym prefiksem, albo znajdują się w danym folderze. Można również powiązać wszystkie klasy z zestawu z odpowiadającymi im interfejsami.
+Aby ułatwić proces wiązania danych obiektów, można zamiast rejestrować poszczególne typy, zarejestrować cały zestaw wraz z określeniem pewnych warunków. Można na przykład zarejestrować wszystkie obiekty z~zestawu, których nazwy zaczynają się danym prefiksem, albo znajdują się w danym folderze. Można również powiązać wszystkie klasy z zestawu z odpowiadającymi im interfejsami.
 \begin{lstlisting}
 builder.RegisterAssemblyTypes(Assembly.Load(nameof(DependencyInversionPrincipleLib)))
 //.Where(t => t.Namespace.Contains("Loggers")) //only from specific folder
 .AsImplementedInterfaces(); //register the type as providing all of its public interfaces as services (excluding IDisposable).
-
 \end{lstlisting}
+
+% Jeśli zarejestrujemy kilka implementacji tego samego interfejsu, to Autofac utworzy jeden typ \texttt{IEnumerable<IInterface>}. Dalej taka kolekcja jest wstrzykiwana podczas tworzenia obiektu. 
+% Inaczej można wykorzystać konkretną implementację na trzy sposobu:
+% - typy wyliczeniowe,
+% - metadane z Autofac
+% - metadane w kazdym widoku
+% Typy wyliczeniowe:
+%\begin{lstlisting}
+%public enum ViewerType { PdfLarge, PdfSmall, XlsLarge, XlsSmall }
+%builder.RegisterType<PdfViewerLarge>().Keyed<IViewer>(ViewerType.PdfLarge);
+%builder.RegisterType<PdfViewerSmall>().Keyed<IViewer>(ViewerType.PdfSmall);
+%builder.RegisterType<XlsViewerLarge>().Keyed<IViewer>(ViewerType.XlsLarge);
+%
+%
+%public class HomeController : Controller
+%{
+%	private readonly IIndex<ViewerType, IViewer> _viewers;
+%	
+%	public HomeController(IIndex<ViewerType, IViewer> viewers)
+%	{
+%		_viewers = viewers;
+%	}
+%}
+%
+%public ActionResult Index()
+%{
+%	var viewer = _viewers[ViewerType.PdfLarge];
+%	
+%	// do something with viewer
+%	
+%	return View();
+%}
+%\end{lstlisting}
+% 
+%Można również dodać metadane to rejestrowanego typu.
+%
+%\begin{lstlisting}
+%builder.Register(c => new PdfViewerLarge())
+%.As<IViewer>()
+%.WithMetadata("FileType", ".pdf");
+%\end{lstlisting}
+% Metadane z autofac:
+%Można również użyć metadanych silnie typowanych. Wcześniej konieczne jest określenie kluczy metadanych.
+%
+%\begin{lstlisting}
+%public interface IViewerMetadata
+%{
+%	string FileType { get; }
+%	long MaxFileSize { get; }
+%}
+%\end{lstlisting}
+%
+%Dalej już można wykorzystywać tych  metadanych.
+%
+%\begin{lstlisting}
+%builder.RegisterType<XlsViewerSmall>()
+%.As<IViewer>()
+%.WithMetadata<IViewerMetadata>(m =>
+%{
+%	m.For(p => p.MaxFileSize, 10000);
+%	m.For(p => p.FileType, ".xls");
+%});
+%\end{lstlisting}
+%
+%W kontrolerze MVC widoki będą wstrzykiwane w następujący sposób:
+%
+%\begin{lstlisting}
+%public class HomeController : Controller
+%{
+%	private IEnumerable<Meta<IViewer, IViewerMetadata>> _viewers;
+%	
+%	public HomeController(
+%	IEnumerable<Meta<IViewer, IViewerMetadata>> viewers)
+%	{
+%		_viewers = viewers;
+%	}
+%}
+%\end{lstlisting}
+%
+%Na koniec można już wykorzystywać konkretną implementację.
+%
+%\begin{lstlisting}
+%public ActionResult Index()
+%{
+%	var viewer = _viewers.Single(
+%	it => it.Metadata.FileType == ".xls" &&
+%	it.Metadata.MaxFileSize > 1000
+%	).Value;
+%	
+%	
+%	// do something with viewer
+%	
+%	return View();
+%}
+%\end{lstlisting}

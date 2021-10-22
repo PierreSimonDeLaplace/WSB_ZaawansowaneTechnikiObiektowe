@@ -3,11 +3,11 @@ Wzorce kreacyjne pozwalają na tworzenie obiektów w sposób zwiększający elas
 %\url{https://softwareengineering.stackexchange.com/questions/365119/is-using-new-in-the-constructor-always-bad}
 
 \subsection{Fabryka abstrakcyjna (ang. abstract factory)}\label{sec/lab2/abstractFactory}
-Fabryka abstrakcyjna jest wzorcem projektowym, który przenosi proces tworzenia obiektów (często ze sobą w~jakiś sposób powiązanych) do osobnej klasy implementującej interfejs zawierający metody tworzące dane obiekty. Tworzone przez fabryki instancje powinny posiadać zgodne interfejsy.
+Fabryka abstrakcyjna jest wzorcem projektowym, który przenosi proces tworzenia obiektów (często ze sobą w~jakiś sposób powiązanych) do osobnej klasy implementującej interfejs zawierający metody zwracające te obiekty. Tworzone przez fabryki instancje powinny posiadać zgodne interfejsy.
 
-Klient może posiadać konstruktor, który jako parametr przyjmie obiekt implementujący interfejs abstrakcyjny. Wewnątrz konstruktora klient wywołując odpowiednie metody może tworzyć konkretne obiekty bez znajomości ich szczegółowej implementacji. Przekazując inny obiekt fabryki abstrakcyjnej możliwa jest łatwa zmiana wykorzystywanych przez klienta obiektów.
+Klient fabryki może posiadać konstruktor, który jako parametr przyjmie obiekt konkretnej fabryki. Wewnątrz konstruktora klient może przypisać przekazaną instancję do prywatnego pola. Zakładamy, że zarówno prywatne pole wewnątrz klasy klienta jak i typ przekazywanego przez konstruktor argumentu jest typem interfejsu, który implementuje każda konkretna fabryka. Wywołując odpowiednie metody obiektu fabryki, klient może tworzyć konkretne instancje zwracane przez fabrykę bez znajomości ich szczegółowej implementacji. Przekazując inny obiekt fabryki abstrakcyjnej możliwa jest łatwa zmiana pośrednio tworzonych przez klienta obiektów.
 
-Jako przykład można wyobrazić sobie aplikację wykorzystującą interfejs graficzny, która przyjmuje jako argument obiekty fabryki implementujące interfejs \texttt{IGuiFactory}. Interfejs ten mógłby definiować metody tworzenia poszczególnych elementów graficznych np. \texttt{CreateButton()}, \texttt{CreateListBox()}, \texttt{CreateProgressBar()} itp. Następnie w zależności od systemu operacyjnego można by stworzyć obiekty fabryk \texttt{WindowsFactory} oraz \texttt{UnixFactory}, oba implementujące określony wcześniej interfejs. Aplikacja posiadające logikę rysująca okno użytkownika nie musi w takim przypadku nawet wiedzieć z jakim systemem ma do czynienia, jest od niego niezależna. Może wywoływać metody tworzące kontrolki UI za pomocą abstrakcyjnego interfejsu \texttt{IGuiFactory}. Wybór konkretnej fabryki mógłby być określany w momencie uruchamiania się aplikacji.
+Jako przykład użycia omawianego wzorca można wyobrazić sobie aplikację wykorzystującą interfejs graficzny. Klasa tworząca kontrolki interfejsu użytkownika może przyjmować obiekt fabryki implementującej interfejs \texttt{IGuiFactory}. Interfejs ten mógłby definiować metody tworzenia poszczególnych elementów graficznych np. \texttt{CreateButton()}, \texttt{CreateListBox()}, \texttt{CreateProgressBar()} itp. Następnie w zależności od systemu operacyjnego można by stworzyć obiekty fabryk \texttt{WindowsFactory} oraz \texttt{UnixFactory}, oba implementujące określony wcześniej interfejs. Obiekt zawierający implementację logiki rysującej okno użytkownika nie musiałby wiedzieć z jakim systemem operacyjnym ma do czynienia, nie posiadałby zależności do konkretnej implementacji. Mógłby wywoływać metody tworzące kontrolki UI za pomocą abstrakcyjnego interfejsu \texttt{IGuiFactory}. Wybór konkretnej fabryki mógłby być określany w~momencie uruchamiania aplikacji.
 
 \begin{figure}[hbt!]
 	\centering
@@ -29,7 +29,7 @@ Jako przykład można wyobrazić sobie aplikację wykorzystującą interfejs gra
 
 \subsubsection{Zadanie 1}
 
-Utwórz nowy projekt aplikacji konsolowej .NET 5.0. W osobnych plikach stwórz trzy interfejsy: \texttt{IButton}, \texttt{ICheckbox} oraz \texttt{IGuiFactory}. Pierwsze dwa niech posiadają jedną metodę \texttt{void Draw()}, natomiast interfejs fabryki \texttt{IGuiFactory} dwie metody:\texttt{IButton CreateButton()} oraz \texttt{ICheckbox CreateCheckBox()}.
+Utwórz nowy projekt aplikacji konsolowej .NET 5.0. W osobnych plikach dodaj do projektu trzy interfejsy: \texttt{IButton}, \texttt{ICheckbox} oraz \texttt{IGuiFactory}. Pierwsze dwa niech posiadają jedną metodę \texttt{void Draw()}, natomiast interfejs fabryki \texttt{IGuiFactory} dwie metody:\texttt{IButton CreateButton()} oraz \texttt{ICheckbox CreateCheckBox()} Typem zwracanym przez te dwie metody są obiekty implementujące odpowiednio \texttt{IButton} oraz \texttt{ICheckbox}.
 
 Umieść w~projekcie dwa foldery \texttt{Macintosh} oraz \texttt{Windows}. Wewnątrz tych folderów dodaj implementacje stworzonych przed chwilą interfejsów. Wszystkie metody \texttt{Draw} zaimplementuj tak, aby wypisywały na ekranie konsoli komunikat symulujący, że kontrolki zostały narysowane np.:
 \begin{lstlisting}
@@ -41,7 +41,7 @@ internal class MacButton : IButton
 
 %Tip: Ustawiając kursor na nazwę interfejsu i klikając Alt+Enter możesz uruchomić narzędzie refaktoryzacyjne i wybrać opcję \texttt{Implement interface}. Visual Studio automatycznie doda do klasy metody wymagające implementacji.
 
-Po napisaniu analogicznych metod dla pozostałych kontrolek, utwórz po jednej klasie fabryki w~każdym z~folderów. Klasa fabryki powinna zwracać instancję klasy odpowiadającej danej kontrolce np.:
+Po napisaniu analogicznych metod dla pozostałych kontrolek, utwórz po jednej klasie fabryki w~każdym z~folderów. Każda klasa fabryki powinna zwracać obiekty konkretnych kontrolek UI np.:
 \begin{lstlisting}
 public class MacFactory : IGuiFactory
 {
@@ -50,7 +50,7 @@ public class MacFactory : IGuiFactory
 }
 \end{lstlisting}
 
-Teraz w katalogu głównym utwórz klasę \texttt{UserInterface}, która będzie posiadała prywatne pole typu \texttt{IGuiFactory}. W~konstruktorze przypisz przekazywany do wnętrza klasy obiekt do utworzonego przed chwilą prywatnego pola. Napisz metodę \texttt{DrawWindow}, w której pobierzesz z~fabryki instancje klas implementujących \texttt{IButton} oraz \texttt{ICheckbox} i wywołasz metodę \texttt{Draw} dla każdego z~nich.
+Teraz w katalogu głównym projektu utwórz klasę \texttt{UserInterface}, która będzie posiadała prywatne pole typu \texttt{IGuiFactory}. Dodaj do tej klasy konstruktor z jednym parametrem typu \texttt{IGuiFactory}. Przypisz przekazywany do wnętrza klasy obiekt do utworzonego przed chwilą prywatnego pola. Napisz metodę \texttt{DrawWindow}, w której pobierzesz z~fabryki instancje klas implementujących \texttt{IButton} oraz \texttt{ICheckbox} i wywołasz metody \texttt{Draw} każdego z~nich.
 
 W metodzie \texttt{Main} sprawdź działanie wzorca fabryki abstrakcyjnej:
 \begin{lstlisting}
@@ -75,7 +75,7 @@ class Program
 %https://refactoring.guru/design-patterns/factory-comparison
 Fabryka jest ogólnym terminem, który jest używany w stosunku do metod i klas, które tworzą obiekty. Podczas laboratoriów został omówiony wzorzec fabryki abstrakcyjnej, który służy do tworzenia całych rodzin podobnych albo powiązanych ze sobą obiektów bez precyzowania konkretnych klas. Jeśli jednak program nie wymaga tworzenia takich rodzin najprawdopodobniej fabryka abstrakcyjna nie jest konieczna. 
 
-Inną prostą fabryką może być klasa, która posiada metodę wytwórczą, z wyrażeniem \texttt{switch-case} które analizuje przekazywany do niej parametr i tworzy odpowiednią instancję konkretnej klasy. Często jest to pojedyncza metoda w pojedynczej klasie. Z czasem kiedy liczba tworzonych obiektów rośnie może ona się przekształcić z metodę fabrykującą. 
+Inną prostą fabryką może być klasa, która posiada metodę wytwórczą, z wyrażeniem \texttt{switch-case} które analizuje przekazywany do niej parametr i tworzy odpowiednią instancję konkretnej klasy. Często jest to pojedyncza metoda w~pojedynczej klasie. Z czasem kiedy liczba tworzonych obiektów rośnie może ona się przekształcić z metodę fabrykującą. 
 %\begin{lstlisting}
 %class UserFactory {
 %	public static function create($type) {
@@ -116,9 +116,11 @@ Metoda fabrykująca udostępnia interfejs do tworzenia obiektów, ale pozwala kl
 %\end{lstlisting}
 
 \subsection{Budowniczny (ang. builder)}\label{lab2/sec/builderPattern}
-Budowniczy jest wzorcem, który może być wykorzystany do tworzenia złożonego obiektu krok po kroku. Czasami istnieje pokusa stworzenia konstruktora przyjmującego dużą liczbę argumentów. Może tak się zdarzyć jeśli klasa korzysta z~wielu zależności albo niektóre jej cechy mogą być parametryzowane. Część z tych argumentów może dodatkowo być opcjonalna. Budowniczy przenosi proces tworzenia takiej instancji do osobnego obiektu. 
+Budowniczy jest wzorcem, który może być wykorzystany do tworzenia złożonego obiektu \textbf{krok po kroku}. W przeciwieństwie do wzorca fabryki abstrakcyjnej, która tworzy obiekty \textbf{w~jednym kroku}.
 
-Czynności wywoływania poszczególnych metod można przenieść do obiektu kierownika (ang. director), który będzie przyjmował jako argument konstruktora obiekt budowniczego i wywoływał metody interfejsu \texttt{IBuilder}. Obiekt kierownika jest opcjonalny, klient może samemu tworzyć instancję budowanego typu. 
+Czasami istnieje pokusa stworzenia konstruktora przyjmującego dużą liczbę argumentów. Może tak się zdarzyć jeśli klasa korzysta z~wielu zależności albo gdy niektóre jej cechy mogą być parametryzowane. Część z tych argumentów może dodatkowo być opcjonalna. Budowniczy przenosi proces tworzenia takiej instancji do osobnego obiektu. 
+
+Czynności wywoływania poszczególnych metod konfigurujących tworzony obiekt można przenieść do obiektu kierownika (ang. director), który będzie przyjmował jako argument konstruktora obiekt budowniczego i~wywoływał metody interfejsu \texttt{IBuilder}. Obiekt kierownika jest opcjonalny, klient może samemu tworzyć instancję budowanego typu. 
 
 Konkretni budowniczowie powinni dostarczyć swoje własne metody zwracania wyników procesu budowania obiektu. Różni budowniczowie mogą zwracać zupełnie inne typy dlatego tego procesu często nie da się umieścić w interfejsie \texttt{IBuilder} (przynajmniej w przypadku języków programowania, które są silnie typowane). 
  
@@ -146,11 +148,11 @@ var sorted  = filtered.OrderBy(t => t.Value.Length);
 var finalQuery = sorted.Select(t => t.Value.ToUpper());
 \end{lstlisting}
 
-W przeciwieństwie do wzorca fabryki abstrakcyjnej, która tworzy obiekty w~jednym kroku, budowniczy tworzy jeden złożony obiekt krok po kroku.
-
 \subsubsection{Zadanie 2}
 
-Utwórz projekt .NET 5.0. Dodaj do niego klasę \texttt{Car} i dodaj do niej właściwości ze słowem kluczowym \texttt{init}\footnote{Słowo kluczowe \texttt{init} pojawiło się w C\# 9.0 i~stanowi ułatwienie w tworzeniu obiektów niemutowalnych (niezmiennych). Wcześniej konieczne było wykorzystywanie słowa kluczowego \texttt{readonly} i tworzenie obszernych konstruktorów.}\ref{lab2/lst/immutableProperties}. 
+Utwórz projekt .NET 5.0. Dodaj do niego klasę \texttt{Car} i umieść do niej właściwości ze słowem kluczowym \texttt{init}\footnote{Słowo kluczowe \texttt{init} pojawiło się w C\# 9.0 i~stanowi ułatwienie w tworzeniu obiektów niemutowalnych (niezmiennych). Wcześniej konieczne było wykorzystywanie słowa kluczowego \texttt{readonly} i tworzenie obszernych konstruktorów.}\ref{lab2/lst/immutableProperties}.
+
+% Jeśli użyjemy jedynie akcesora get przy właściwości to można przypisać jej wartość w konstruktorze, ale konieczne jest przekazanie wartości przez argument konstruktora :(
 
 % OPOWIEDZIEĆ O REKORDACH
 %Ponieważ w przypadku chęci utworzenia nowego obiektu niemutowalnego, który będzie posiadał inne wartości tylko kilku właściwości konieczne jest tworzenie nowego obiektu i ponowne przypisanie za pomoc listy inicjalizacji wszystkich właściwości pojawiły się w C\# również rekordy. Wykorzystując rekordy można przy przypisywaniu rekordu do innego rekordu użyć słowa kluczowego \texttt{with} i zmienić tylko tę jedną właściwość na której nam zależy, reszta zostanie automatycznie przepisana. Dodatkowo w przypadku rekordów porównywanie dwóch obiektów przebiega pole po polu. Kompilator automatycznie tworzy konstruktor kopiujący. Rekord wraz z~konstruktorem oraz destruktorem tworzy się za pomocą poniższego zapisu:
@@ -158,7 +160,7 @@ Utwórz projekt .NET 5.0. Dodaj do niego klasę \texttt{Car} i dodaj do niej wł
 %	public record Friend(string FirstName,string MiddleName, string LastName);
 %\end{lstlisting}
 %Obiekt typu \texttt{Friend} będzie posiadał właściwości takie jak argumenty rekordu.
-%Przykład stosowanie rekordów:
+%Przykład stosowania rekordów:
 %\begin{lstlisting}
 %	using System;
 %	namespace RecordsVS
@@ -213,21 +215,23 @@ public string Gps { get; init; }
 \end{lstlisting}
 
 
-Zdefiniuj w klasie \texttt{Car} konstruktor z modyfikatorem dostępu \texttt{private}:
+Zdefiniuj w klasie \texttt{Car} prywatny konstruktor (wykorzystaj modyfikator dostępu private):
 \begin{lstlisting}
 private Car() { }
 \end{lstlisting}
+Zwróć uwagę, że nie będzie możliwe utworzenie obiektu klasy \texttt{Car} za pomocą słowa kluczowego \texttt{new} w powodu braku dostępnego konstruktora.
 
-W osobnym pliku utwórz interfejs \texttt{ICarBuilder}, który będzie posiadał następujące metody zwracające \texttt{void}:
+W osobnym pliku utwórz interfejs \texttt{ICarBuilder}, który będzie posiadał następujące metody zwracające typ \texttt{void}:
 \begin{itemize}
 	\item Reset(),
 	\item SetEngine(),
 	\item SetSeats(),
 	\item SetTripComputer(),
-	\item SetGps().
+	\item SetGps(),
+	\item SetManual().
 \end{itemize}
 
-Wewnątrz klasy \texttt{Car}, zdefiniuj klasę \texttt{CarBuilder} implementującą interfejs \texttt{ICarBuilder}. Zwróć uwagę, że klasa ta ma dostęp do prywatnych składowych klas (w tym konstruktora). Utworzenie instancji tej klasy będzie możliwe jedynie przez klasę budowniczego. W~\texttt{CarBuilder} utwórz prywatne pola typu \texttt{string}: \texttt{seats}, \texttt{engine}, \texttt{tripComputer} oraz \texttt{gps}.
+\textbf{Wewnątrz} klasy \texttt{Car}, zdefiniuj klasę \texttt{CarBuilder} implementującą interfejs \texttt{ICarBuilder}. Zwróć uwagę, że klasa ta ma dostęp do prywatnych składowych klas (w tym konstruktora). Utworzenie instancji tej klasy będzie możliwe jedynie przez klasę budowniczego. W klasie budowniczego utwórz prywatne pola typu \texttt{string}: \texttt{seats}, \texttt{engine}, \texttt{tripComputer} oraz \texttt{gps}.
 
 Zaimplementuj interfejs \texttt{ICarBuilder}. W każdej metodzie ustawiającej dany fragment samochodu, przypisz jakiś łańcuch znaków pozwalający na późniejszą identyfikację np.:
 \begin{lstlisting}
@@ -255,12 +259,16 @@ public Car Build()
 }
 \end{lstlisting}
 
-W metodzie \texttt{Main} utwórz korzystając z budowniczego instancję klasy \texttt{Car}. Aby to zrobić stwórz obiekt \texttt{CarBuilder}, następnie wywołaj metody ustawiające poszczególne właściwości (nie jest konieczne wywoływanie ich wszystkich) i utwórz obiekt za pomocą metody \texttt{Build}. Sprawdź czy utworzona instancja typu \texttt{Car} zawiera prawidłowe wartości odpowiednich właściwości tej klasy.  Możesz to zrobić wypisując je na ekranie konsoli. Ewentualnie można przeciążyć metodę \texttt{ToString} tak, aby zwracała łańcuch znaków zawierający te informacje.
+W metodzie \texttt{Main} korzystając z budowniczego utwórz instancję klasy \texttt{Car}. Aby to zrobić stwórz obiekt \texttt{CarBuilder}, następnie wywołaj metody ustawiające poszczególne właściwości (nie jest konieczne wywoływanie ich wszystkich) i utwórz obiekt za pomocą metody \texttt{Build}. Sprawdź czy utworzona instancja typu \texttt{Car} zawiera prawidłowe wartości odpowiednich właściwości tej klasy. Możesz to zrobić wypisując je na ekranie konsoli. Ewentualnie można przeciążyć metodę \texttt{ToString} tak, aby zwracała łańcuch znaków zawierający te informacje.
 
 Utwórz klasę kierownika \texttt{Director}. Niech posiada ona prywatne pole typu \texttt{ICarBuilder} oraz właściwość \texttt{set}:
 \begin{lstlisting}
-private ICarBuilder _builder;
-public ICarBuilder Builder { set { _builder = value; } }
+internal class Director()
+{
+	private ICarBuilder _builder;
+	public ICarBuilder Builder { set { _builder = value; } }
+	//...
+}
 \end{lstlisting}
 Dodatkowo umieść w niej dwie metody: \texttt{BuildMinimalViableProduct} oraz \texttt{BuildFullFeaturedProduct}. Obie metody niech zwracają typ \texttt{void}. W pierwszej wywołaj dwie z dostępnych metod tworzenia obiektu przez budowniczego, w drugim wszystkie.
 % Viable - wykonalny, realny
@@ -268,7 +276,7 @@ Dodatkowo umieść w niej dwie metody: \texttt{BuildMinimalViableProduct} oraz \
 Z poziomu metody \texttt{Main} utwórz obiekt \texttt{CarBuilder} oraz \texttt{Director}. Przypisz kierownikowi obiekt budowniczego. Następnie wywołaj jedną z dostępnych metod kierownika. Na koniec pobierz ,,zbudowany'' obiekt za pomocą metody \texttt{Build} klasy \texttt{CarBuilder}. Sprawdź utworzone elementy obiektu \texttt{Car}.
 
 \subsubsection{Zadanie 3}
-Wewnątrz klasy \texttt{Car} utwórz drugiego budowniczego. Tym razem do implementacji wykorzystaj tzw. Płynne Interfejsy. Jedyną różnicą względem poprzedniej implementacji będzie fakt, że tym razem metody ustawiające wartości prywatnym polom (te metody, który ,,budują'' obiekt), będą zwracały instancję klasy budowniczego. Konieczne jest skorzystanie ze słowa kluczowego \texttt{this} zwracającego instancję kasy:
+Wewnątrz klasy \texttt{Car} utwórz drugiego budowniczego. Tym razem do implementacji wykorzystaj tzw. Płynne Interfejsy. Jedyną różnicą względem poprzedniej implementacji będzie fakt, że tym razem metody ustawiające wartości prywatnym polom (te metody, które ,,budują'' obiekt), będą zwracały instancję klasy budowniczego. Konieczne jest skorzystanie ze słowa kluczowego \texttt{this} zwracającego instancję kasy np.:
 \begin{lstlisting}
 public CarBuilderFluent SetSeats()
 {
