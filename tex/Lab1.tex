@@ -27,10 +27,10 @@ Jako przykład przeanalizujmy interfejs \texttt{IModem}.
 \begin{lstlisting}[caption={Naruszenie zasady SRP}, label={lab1/lst/srpViolationModem}]
 public interface IModem
 {
-	public void Dial(string phoneNumber);
-	public void Hangup();
-	public void Send(char c);
-	public char Recieve();
+	void Dial(string phoneNumber);
+	void Hangup();
+	void Send(char c);
+	char Recieve();
 }
 \end{lstlisting}
 Widać, że interfejs mógłby zostać podzielony na dwa obszary odpowiedzialności. Jeden odpowiadający za nawiązywanie i zrywanie połączeń, drugi natomiast za same funkcje komunikacyjne. Klasy klienckie mogłyby wykorzystywać klasę implementującą dwa interfejsy np. \texttt{IDataChannel} i \texttt{IConnection} i tym samym uzależnić się tylko od jednego z obszarów odpowiedzialności. 
@@ -361,7 +361,7 @@ Przeanalizujmy poniższy diagram UML. W tym przypadku zmiana obiektu \texttt{Ord
 %[Client]
 %[Order]
 
-Stosując wzorzec projektowy strategia, który zostanie omówiony na kolejnych zajęciach mamy możliwość odwrócenia zależności. Jeśli w~wyniku rozszerzania, zmian funkcjonalności okaże się, że klasa \texttt{Order} powinna zostać zamieniona, będzie można utworzyć nową wersję klasy implementującej interfejs zdefiniowany przez klienta i ją podmienić bez modyfikacji w samej klasie \texttt{Client}.
+Stosując wzorzec projektowy strategia\ref{lab4/sec/strategy}, który zostanie omówiony na kolejnych zajęciach mamy możliwość odwrócenia zależności. Jeśli w~wyniku rozszerzania, zmian funkcjonalności okaże się, że klasa \texttt{Order} powinna zostać zamieniona, będzie można utworzyć nową wersję klasy implementującej interfejs zdefiniowany przez klienta i ją podmienić bez modyfikacji w samej klasie \texttt{Client}.
 
 %Zastosowano interfejs IClient zamiast IOrder, ponieważ związki klas abstrakcyjnych z klasami klienckimi są ściślejsze niż z konkretnymi potomnymi, które je implementują.
 \begin{figure}[hbt!]
@@ -989,7 +989,7 @@ public class Regulator
 % engage - zalaczac, furnace - piec 
 % In physics and materials science, the Curie temperature (TC), or Curie point, is the temperature above which certain materials lose their permanent magnetic properties. The Curie temperature is named after Pierre Curie, who showed that magnetism was lost at a critical temperature.[1]. Curie point electro-magnets have been proposed and tested for actuation mechanisms in passive safety systems of fast breeder reactors, where control rods are dropped into the reactor core if the actuation mechanism heats up beyond the material's curie point. Other uses include temperature control in soldering irons.
 
-Możesz utworzyć dwa dodatkowe interfejsy, jeden dla obiektów mierzących temperaturę \texttt{ISensor} i drugi dla obiektów odpowiedzialnych za zmianę temperatury np. pieców \texttt{IDevice}. Dalej utwórz dwie klasy implementujące te interfejsy np. \texttt{Thermometer} oraz \texttt{Heater} i uzależnij obiekt regulacji od tych abstrakcji. Przekaż obiekt mierzący temperaturę oraz odpowiedzialny za sterownie urządzeniem przez konstruktor tej klasy. 
+Możesz utworzyć dwa dodatkowe projekty jeden w którym dodasz interfejsy, jeden dla obiektów mierzących temperaturę \texttt{ISensor} i jeden dla obiektów odpowiedzialnych za zmianę temperatury np. pieców \texttt{IDevice}. Natomiast drugi projekt niech zawiera implementacje utworzonych przed chwilą interfejsów np. \texttt{Thermometer} oraz \texttt{Heater}. Klasa \texttt{Regulator} powinna następnie zostać uzależniona od projektu z interfejsami. Obiekty implementujące \texttt{ISensor} oraz \texttt{IDevice} powinny zostać wstrzyknięte do klasy przez konstruktor. W metodzie \texttt{main} utwórz instancję klasy \texttt{Regulator} i sprawdź jej działanie wywołując metodę \texttt{Regulate()}.
 
 \subsection{Kontenery IoC (ang. Inversion of Control)}
 Kontenery IoC takie jak Castle Windsor, Autofac czy Ninject ułatwiają wstrzykiwanie zależności. Jeśli pracujemy nad dużym projektem, w którym klasy zależą od wielu innych i wykorzystują mechanizm wstrzykiwania zależności można wykorzystać kontener IoC, aby ułatwić sobie proces tworzenia obiektów. 
