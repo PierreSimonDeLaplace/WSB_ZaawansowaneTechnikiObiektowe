@@ -199,7 +199,7 @@ Przykładem zastosowania wzorca Strategia może być nawigacja i różne algoryt
 \subsubsection{Zadanie 2}
 W solucji dodaj kolejny projekt aplikacji konsolowej .NET 5.0. Dodaj w nim interfejs \texttt{IRouteStrategy} z~jedną metodą \texttt{BuildRoute}, nie przyjmującą żadnych argumentów i~zwracającą typ \texttt{void}. 
 
-Następnie dodaj trzy klasy: \texttt{PublicTransportStrategy}, \texttt{RoadStrategy} i \texttt{WalkingStrategy} implementujące interfejs \texttt{IRouteStrategy} np. w następujący sposób\footnote{W rzeczywistym przypadku metody \texttt{BuildRoute} powinny przyjmować współrzędne lokalizacyjne i~zwracać faktyczną drogę umożliwiającą przemieszczenie się z~punktu A do punktu B. Jednak na potrzeby zajęć laboratoryjnych...}:
+Następnie dodaj trzy klasy: \texttt{PublicTransportStrategy}, \texttt{RoadStrategy} i \texttt{WalkingStrategy} implementujące interfejs \texttt{IRouteStrategy} np. w następujący sposób\footnote{W rzeczywistym przypadku metody \texttt{BuildRoute} powinny przyjmować współrzędne lokalizacyjne i~zwracać faktyczną drogę umożliwiającą przemieszczenie się z~punktu A do punktu B.}:
 \begin{lstlisting}
 public class PublicTransportStrategy : IRouteStrategy
 {
