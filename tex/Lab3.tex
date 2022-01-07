@@ -229,7 +229,7 @@ class Client
 }
 \end{lstlisting}
 
-\subsection{Fasada (ang. facade)}
+\subsection{Fasada (ang. facade)}\label{lab3/sec/FacadeUml}
 Jeśli istnieje potrzeba, aby ukryć złożoność całej biblioteki albo pewnego zbioru wielu klas można użyć wzorca projektowego Fasada (diagram UML przedstawiono na rysunku~\ref{lab3/fig/FacadeUml}). Jest to wzorzec upraszczający sposób w jaki klienci korzystają z współpracujących, zależnych od siebie klas. Fasada udostępnia jednolity interfejs dla zbioru interfejsów z podsystemu. Wykorzystując Fasadę klient nie musi tworzyć, ani zarządzać zależnościami pomiędzy obiektami, są one przed nim ukryte za interfejsem Fasady. Wzorzec ten może również służyć za punkt wejścia dla podsystemu w~warstwowo podzielonym zestawie.
 
 Fasada pozwala zmniejszyć liczbę obiektów z której korzystają klienci. Dodatkowo wprowadza luźne powiązanie pomiędzy klientami, a podsystemami. Ułatwione jest dzięki temu wprowadzanie zmian w~podsystemach jak również zmiana zależności między nimi. 
