@@ -1,2 +1,3 @@
 # WSB Zaawansowane techniki obiektowe
-<a href="https://pierresimondelaplace.gitlab.io/wsb-zaawansowane-techniki-obiektowe/WSB_ZaawansowaneTechnikiObiektowe.pdf">Instrukcja do laboratoriów</a>
+[![CI/CD](https://github.com/PierreSimonDeLaplace/WSB_ZaawansowaneTechnikiObiektowe/actions/workflows/build_and_deploy.yml/badge.svg)](https://github.com/PierreSimonDeLaplace/WSB_ZaawansowaneTechnikiObiektowe/actions/workflows/build_and_deploy.yml)<br>
+<a href="https://pierresimondelaplace.github.io/WSB_ZaawansowaneTechnikiObiektowe/Instrukcja.pdf">Instrukcja do laboratoriów</a>

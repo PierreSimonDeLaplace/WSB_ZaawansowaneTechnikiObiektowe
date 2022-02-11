@@ -1,0 +1,43 @@
+name: CI/CD
+on: [push]
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    env:
+      # Edit here with the names of your latex file and directory (can use ".")
+      DIR: .
+      FILE: Instrukcja
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install TeXlive
+        run: sudo apt-get install texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra texlive-lang-polish texlive-bibtex-extra biber
+      - name: LaTeX compile
+        working-directory: ${{ env.DIR }}
+        run: pdflatex ${{ env.FILE }}.tex; pdflatex ${{ env.FILE }}.tex; biber ${{ env.FILE }}; biber ${{ env.FILE }}; pdflatex ${{ env.FILE }}.tex
+      - name: move
+        run: mkdir -p github_artifacts && mv ${{ env.DIR }}/${{ env.FILE }}.pdf ./github_artifacts/
+      - name: Upload pdf as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.FILE }}.pdf
+          path: ./github_artifacts
+  deploy:
+    # Edit here if compiling multiple papers
+    needs: [paper]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          path: github_artifacts
+      - name: move
+        run: mkdir -p github_deploy && mv github_artifacts/*/* github_deploy
+      - name: deploy on orphan branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./github_deploy
+          publish_branch: gh-pages
+          force_orphan: true
